@@ -1007,6 +1007,541 @@ function filterSearchItems() {
 }
 
 
+/* ========================================
+   PHASE 5 — ITEM MATCHING AND CLAIMS
+======================================== */
+
+
+// ========================================
+// 1. CLAIM PAGE NAVIGATION
+// ========================================
+
+const claimForm =
+    document.getElementById("claim-form");
+
+
+document.getElementById("open-claims-btn")
+    .addEventListener("click", async function() {
+
+        showPage("claims-page");
+
+        await loadMyClaims();
+
+    });
+
+
+document.getElementById("claim-back-btn")
+    .addEventListener("click", async function() {
+
+        showPage("search-page");
+
+        await loadSearchItems();
+
+    });
+
+
+// ========================================
+// 2. FIND POSSIBLE MATCHES
+// ========================================
+
+function findPossibleMatches(lostItem) {
+
+    const normalize = function(value) {
+
+        return (value || "")
+            .trim()
+            .toLowerCase();
+
+    };
+
+
+    return allSearchItems.filter(function(item) {
+
+        // Only compare with found reports
+        // that are still available.
+
+        if (
+            item.report_type !== "found" ||
+            item.status !== "found"
+        ) {
+
+            return false;
+
+        }
+
+
+        // Match item name.
+
+        const nameMatches =
+            normalize(item.item_name) ===
+            normalize(lostItem.item_name);
+
+
+        // Match category.
+
+        const categoryMatches =
+            normalize(item.category) ===
+            normalize(lostItem.category);
+
+
+        // Match color if both reports
+        // provided a color.
+
+        const colorMatches =
+            !item.color ||
+            !lostItem.color ||
+            normalize(item.color) ===
+            normalize(lostItem.color);
+
+
+        return (
+            nameMatches &&
+            categoryMatches &&
+            colorMatches
+        );
+
+    });
+
+}
+
+
+// ========================================
+// 3. OPEN OWNERSHIP CLAIM FORM
+// ========================================
+
+function openClaimForm(item) {
+
+    if (item.status !== "found") {
+
+        showNotification(
+            "This item is no longer available for new claims.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    // Store the selected found-item ID.
+
+    document.getElementById(
+        "claim-found-id"
+    ).value = item.id;
+
+
+    // Display item information.
+
+    document.getElementById(
+        "claim-item-name"
+    ).textContent = item.item_name;
+
+
+    document.getElementById(
+        "claim-item-details"
+    ).textContent =
+
+        "Category: " + item.category +
+
+        " | Color: " + (item.color || "Not specified") +
+
+        " | Found at: " + item.location_found;
+
+
+    // Clear previous claim description.
+
+    claimForm.reset();
+
+
+    // Restore selected item after resetting.
+
+    document.getElementById(
+        "claim-found-id"
+    ).value = item.id;
+
+
+    showPage("claim-page");
+
+}
+
+
+// ========================================
+// 4. SUBMIT OWNERSHIP CLAIM
+// ========================================
+
+claimForm.addEventListener(
+    "submit",
+    async function(event) {
+
+        event.preventDefault();
+
+
+        const submitButton =
+            claimForm.querySelector(
+                'button[type="submit"]'
+            );
+
+
+        submitButton.disabled = true;
+
+        submitButton.textContent =
+            "Submitting Claim...";
+
+
+        try {
+
+            const user =
+                await getAuthenticatedUser();
+
+
+            const foundItemId =
+                Number(
+                    document.getElementById(
+                        "claim-found-id"
+                    ).value
+                );
+
+
+            const description =
+                document.getElementById(
+                    "claim-description"
+                ).value.trim();
+
+
+            if (
+                !Number.isSafeInteger(foundItemId) ||
+                foundItemId <= 0
+            ) {
+
+                throw new Error(
+                    "Please select a valid found item."
+                );
+
+            }
+
+
+            if (description.length < 10) {
+
+                throw new Error(
+                    "Please provide more identifying details."
+                );
+
+            }
+
+
+            // Check whether the user already
+            // submitted a claim for this item.
+
+            const { data: existingClaim, error: checkError } =
+                await supabaseClient
+
+                    .from("claims")
+
+                    .select("id")
+
+                    .eq("found_item_id", foundItemId)
+
+                    .eq("claimant_id", user.id)
+
+                    .maybeSingle();
+
+
+            if (checkError) {
+
+                throw checkError;
+
+            }
+
+
+            if (existingClaim) {
+
+                throw new Error(
+                    "You have already submitted a claim for this item."
+                );
+
+            }
+
+
+            // Submit ownership claim.
+
+            const { error } =
+                await supabaseClient
+
+                    .from("claims")
+
+                    .insert({
+
+                        found_item_id: foundItemId,
+
+                        claimant_id: user.id,
+
+                        claim_description: description,
+
+                        status: "pending"
+
+                    });
+
+
+            if (error) {
+
+                if (error.code === "23505") {
+
+                    throw new Error(
+                        "You have already submitted a claim for this item."
+                    );
+
+                }
+
+                throw error;
+
+            }
+
+
+            claimForm.reset();
+
+
+            showNotification(
+                "Your ownership claim has been submitted for verification!"
+            );
+
+
+            showPage("claims-page");
+
+            await loadMyClaims();
+
+
+        } catch (error) {
+
+            console.error(error);
+
+            showNotification(
+                error.message,
+                "error"
+            );
+
+
+        } finally {
+
+            submitButton.disabled = false;
+
+            submitButton.textContent =
+                "Submit Claim Request";
+
+        }
+
+    }
+);
+
+
+// ========================================
+// 5. LOAD MY OWNERSHIP CLAIMS
+// ========================================
+
+async function loadMyClaims() {
+
+    const container =
+        document.getElementById(
+            "my-claims-results"
+        );
+
+
+    container.replaceChildren();
+
+
+    const loading =
+        document.createElement("p");
+
+    loading.className = "empty-message";
+
+    loading.textContent = "Loading your claims...";
+
+    container.appendChild(loading);
+
+
+    try {
+
+        const user =
+            await getAuthenticatedUser();
+
+
+        const { data: claims, error } =
+            await supabaseClient
+
+                .from("claims")
+
+                .select(`
+                    id,
+                    found_item_id,
+                    claim_description,
+                    status,
+                    created_at,
+                    found_items (
+                        item_name,
+                        category,
+                        color
+                    )
+                `)
+
+                .eq("claimant_id", user.id)
+
+                .order("created_at", {
+                    ascending: false
+                });
+
+
+        if (error) {
+
+            throw error;
+
+        }
+
+
+        container.replaceChildren();
+
+
+        if (!claims || claims.length === 0) {
+
+            const empty =
+                document.createElement("p");
+
+            empty.className = "empty-message";
+
+            empty.textContent =
+                "You have not submitted any ownership claims.";
+
+            container.appendChild(empty);
+
+            return;
+
+        }
+
+
+        claims.forEach(function(claim) {
+
+            const card =
+                document.createElement("article");
+
+            card.className = "claim-card";
+
+
+            // Item name
+
+            const title =
+                document.createElement("h3");
+
+            title.textContent =
+                claim.found_items?.item_name ||
+                "Found Item #" + claim.found_item_id;
+
+            card.appendChild(title);
+
+
+            // Claim number
+
+            const claimNumber =
+                document.createElement("p");
+
+            claimNumber.textContent =
+                "Claim Number: " + claim.id;
+
+            card.appendChild(claimNumber);
+
+
+            // Category
+
+            const category =
+                document.createElement("p");
+
+            category.textContent =
+                "Category: " +
+                (claim.found_items?.category || "N/A");
+
+            card.appendChild(category);
+
+
+            // Date submitted
+
+            const date =
+                document.createElement("p");
+
+            date.textContent =
+                "Date Submitted: " +
+
+                new Date(
+                    claim.created_at
+                ).toLocaleString();
+
+            card.appendChild(date);
+
+
+            // Ownership description
+
+            const description =
+                document.createElement("p");
+
+            description.textContent =
+                "Your Ownership Description: " +
+                claim.claim_description;
+
+            card.appendChild(description);
+
+
+            // Claim status
+
+            const status =
+                document.createElement("span");
+
+            status.className =
+                "claim-status " + claim.status;
+
+
+            if (claim.status === "pending") {
+
+                status.textContent =
+                    "PENDING VERIFICATION";
+
+            } else if (claim.status === "approved") {
+
+                status.textContent =
+                    "APPROVED";
+
+            } else {
+
+                status.textContent =
+                    "REJECTED";
+
+            }
+
+
+            card.appendChild(status);
+
+
+            container.appendChild(card);
+
+        });
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        container.replaceChildren();
+
+        const message =
+            document.createElement("p");
+
+        message.className = "empty-message";
+
+        message.textContent =
+            "Unable to load claims: " + error.message;
+
+        container.appendChild(message);
+
+    }
+
+}
+
+
 // SEARCH INPUT EVENT
 
 searchInput.addEventListener(
