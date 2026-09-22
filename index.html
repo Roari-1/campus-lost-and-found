@@ -790,6 +790,134 @@
 </main>
 
 
+<!-- ========================================
+     ADMIN DASHBOARD
+======================================== -->
+
+<main id="admin-page" class="page hidden">
+
+    <section class="dashboard-container">
+
+        <!-- ADMIN HEADER -->
+
+        <div class="dashboard-header">
+
+            <div>
+
+                <h2>Administrator Dashboard</h2>
+
+                <p>
+                    Campus Lost & Found Management
+                </p>
+
+            </div>
+
+            <button
+                type="button"
+                id="admin-back-btn"
+                class="back-btn"
+            >
+                Back to Dashboard
+            </button>
+
+        </div>
+
+
+        <!-- DASHBOARD STATISTICS -->
+
+        <div class="admin-stats">
+
+            <div class="admin-stat-card">
+
+                <h3 id="admin-lost-count">0</h3>
+
+                <p>Lost Reports</p>
+
+            </div>
+
+
+            <div class="admin-stat-card">
+
+                <h3 id="admin-found-count">0</h3>
+
+                <p>Found Reports</p>
+
+            </div>
+
+
+            <div class="admin-stat-card">
+
+                <h3 id="admin-pending-count">0</h3>
+
+                <p>Pending Claims</p>
+
+            </div>
+
+
+            <div class="admin-stat-card">
+
+                <h3 id="admin-returned-count">0</h3>
+
+                <p>Returned Items</p>
+
+            </div>
+
+        </div>
+
+
+        <!-- OWNERSHIP CLAIMS -->
+
+        <div class="admin-section">
+
+            <h2>Ownership Claims</h2>
+
+            <p>
+                Review ownership requests,
+                approve or reject claims,
+                and record completed handovers.
+            </p>
+
+
+            <button
+                type="button"
+                id="admin-refresh-btn"
+            >
+                Refresh Claims
+            </button>
+
+
+            <div
+                id="admin-claims-results"
+                class="admin-claims-grid"
+            ></div>
+
+        </div>
+
+
+        <!-- HANDOVER HISTORY -->
+
+        <div class="admin-section">
+
+            <h2>Completed Handovers</h2>
+
+            <p>
+                View the history of items
+                successfully returned to their owners.
+            </p>
+
+
+            <div
+                id="admin-handovers-results"
+                class="admin-claims-grid"
+            ></div>
+
+        </div>
+
+    </section>
+
+</main>
+
+    
     <!-- NOTIFICATION MESSAGE -->
 
     <div
