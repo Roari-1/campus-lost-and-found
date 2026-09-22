@@ -1,0 +1,47 @@
+
+/* ==========================================
+   PHASE 9A - POSSIBLE MATCH EXPLANATIONS
+========================================== */
+
+.matching-reasons {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-left: 4px solid #2563eb;
+    border-radius: 8px;
+    padding: 14px;
+    margin: 16px 0;
+    color: #1e3a8a;
+}
+
+.matching-reasons strong {
+    display: block;
+    margin-bottom: 10px;
+}
+
+.matching-reasons ul {
+    margin: 0 0 12px;
+    padding-left: 20px;
+}
+
+.matching-reasons li {
+    margin-bottom: 6px;
+    line-height: 1.5;
+}
+
+.matching-disclaimer {
+    font-size: 13px;
+    line-height: 1.5;
+    color: #475569;
+    margin: 0;
+}
+
+.match-btn {
+    display: block;
+    margin-top: 12px;
+}
+
+@media (max-width: 500px) {
+    .matching-reasons {
+        padding: 12px;
+    }
+}
