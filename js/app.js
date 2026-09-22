@@ -1675,6 +1675,7 @@ async function loadMyReports() {
 // 9. CREATE AND DISPLAY ITEM CARDS
 // ========================================
 
+
 function renderItems(items, containerId) {
 
     const container =
@@ -1683,13 +1684,14 @@ function renderItems(items, containerId) {
     container.replaceChildren();
 
 
+    // Display a message when no items exist.
+
     if (items.length === 0) {
 
         const message =
             document.createElement("p");
 
-        message.className =
-            "empty-message";
+        message.className = "empty-message";
 
         message.textContent =
             "No matching reports found.";
@@ -1699,11 +1701,244 @@ function renderItems(items, containerId) {
         return;
 
     }
-status.textContent =
-    "Status: " +
-    item.status.replaceAll("_", " ");
 
-card.appendChild(status);
+
+    // Create a separate card for each item.
+
+    items.forEach(function(item) {
+
+        const card =
+            document.createElement("article");
+
+        card.className = "item-card";
+
+
+        // ITEM TYPE
+
+        const badge =
+            document.createElement("span");
+
+        badge.className =
+            "item-type " + item.report_type;
+
+        badge.textContent =
+            item.report_type === "lost"
+                ? "LOST ITEM"
+                : "FOUND ITEM";
+
+        card.appendChild(badge);
+
+
+        // ITEM NAME
+
+        const title =
+            document.createElement("h3");
+
+        title.textContent = item.item_name;
+
+        card.appendChild(title);
+
+
+        // ITEM DETAILS
+
+        function addDetail(label, value) {
+
+            if (!value) return;
+
+            const paragraph =
+                document.createElement("p");
+
+            const labelElement =
+                document.createElement("strong");
+
+            labelElement.textContent =
+                label + ": ";
+
+            paragraph.appendChild(labelElement);
+
+            paragraph.appendChild(
+                document.createTextNode(value)
+            );
+
+            card.appendChild(paragraph);
+
+        }
+
+
+        addDetail("Category", item.category);
+
+        addDetail("Color", item.color);
+
+
+        addDetail(
+            "Date",
+            item.report_type === "lost"
+                ? item.date_lost
+                : item.date_found
+        );
+
+
+        addDetail(
+            "Location",
+            item.report_type === "lost"
+                ? item.location_lost
+                : item.location_found
+        );
+
+
+        if (item.report_type === "found") {
+
+            addDetail(
+                "Currently Kept At",
+                item.current_location
+            );
+
+        }
+
+
+        // ITEM DESCRIPTION
+
+        if (item.description) {
+
+            const description =
+                document.createElement("p");
+
+            description.className =
+                "item-description";
+
+            description.textContent =
+                item.description;
+
+            card.appendChild(description);
+
+        }
+
+
+        // ITEM STATUS
+
+        const status =
+            document.createElement("p");
+
+        status.className =
+            "item-status";
+
+        status.textContent =
+            "Status: " +
+            item.status.replaceAll("_", " ");
+
+        card.appendChild(status);
+
+
+        // ====================================
+        // PHASE 5: MATCHING AND CLAIM BUTTONS
+        // ====================================
+
+        // These buttons should only appear
+        // on the Search Items page.
+
+        if (containerId === "search-results") {
+
+
+            // LOST ITEM: FIND POSSIBLE MATCHES
+
+            if (
+                item.report_type === "lost" &&
+                item.status === "lost"
+            ) {
+
+                const matches =
+                    findPossibleMatches(item);
+
+
+                if (matches.length > 0) {
+
+                    const matchLabel =
+                        document.createElement("span");
+
+                    matchLabel.className =
+                        "possible-match";
+
+                    matchLabel.textContent =
+                        matches.length +
+                        " POSSIBLE MATCH" +
+                        (matches.length === 1 ? "" : "ES");
+
+                    card.appendChild(matchLabel);
+
+
+                    const matchButton =
+                        document.createElement("button");
+
+                    matchButton.className =
+                        "match-btn";
+
+                    matchButton.textContent =
+                        "View Possible Matches";
+
+
+                    matchButton.addEventListener(
+                        "click",
+                        function() {
+
+                            renderItems(
+                                matches,
+                                "search-results"
+                            );
+
+                        }
+                    );
+
+                    card.appendChild(matchButton);
+
+                }
+
+            }
+
+
+            // FOUND ITEM: CLAIM BUTTON
+
+            if (
+                item.report_type === "found" &&
+                item.status === "found" &&
+                item.user_id !== currentUser?.id
+            ) {
+
+                const claimButton =
+                    document.createElement("button");
+
+                claimButton.className =
+                    "claim-btn";
+
+                claimButton.textContent =
+                    "Claim This Item";
+
+
+                claimButton.addEventListener(
+                    "click",
+                    function() {
+
+                        openClaimForm(item);
+
+                    }
+                );
+
+
+                card.appendChild(claimButton);
+
+            }
+
+        }
+
+
+        // Add this completed item card
+        // to the Search Items or My Reports page.
+
+        container.appendChild(card);
+
+    });
+
+}
+
 
 
 
