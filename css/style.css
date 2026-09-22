@@ -783,3 +783,560 @@ footer {
     cursor: pointer;
 
 }
+
+
+/* =========================================
+   CAMPUS LOST & FOUND
+   DASHBOARD AND ADMIN DESIGN REFRESH
+========================================= */
+
+
+/* PREVENT PAGE CONTENT FROM STRETCHING */
+
+.dashboard-container,
+.list-container,
+.form-container {
+    width: min(1100px, calc(100% - 32px));
+    margin: 24px auto 48px;
+    box-sizing: border-box;
+}
+
+
+/* HIDE ELEMENTS THAT ARE NOT ACTIVE */
+
+.hidden {
+    display: none !important;
+}
+
+
+/* =========================================
+   USER DASHBOARD HEADER
+========================================= */
+
+.dashboard-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+
+    padding: 26px 30px;
+    margin-bottom: 24px;
+
+    background: #ffffff;
+    border: 1px solid #e7edf5;
+    border-radius: 16px;
+
+    box-shadow: 0 4px 18px rgba(15, 23, 42, 0.04);
+}
+
+.dashboard-header h2 {
+    margin: 0 0 6px;
+    color: #142b60;
+    font-size: clamp(21px, 2.4vw, 28px);
+    line-height: 1.25;
+}
+
+.dashboard-header p {
+    margin: 0;
+    color: #64748b;
+}
+
+.dashboard-header-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.dashboard-header-actions button {
+    width: auto;
+    margin: 0;
+    white-space: nowrap;
+}
+
+.admin-header-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    padding: 11px 18px;
+
+    border: 0;
+    border-radius: 9px;
+
+    color: #ffffff;
+    background: #1d4ed8;
+
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.admin-header-btn:hover {
+    background: #1e40af;
+}
+
+#logout-btn {
+    padding: 11px 18px;
+    border-radius: 9px;
+}
+
+
+/* =========================================
+   USER DASHBOARD CARDS
+========================================= */
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 18px;
+}
+
+.dashboard-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+
+    min-width: 0;
+    padding: 24px;
+
+    background: #ffffff;
+    border: 1px solid #e7edf5;
+    border-radius: 15px;
+
+    box-shadow: 0 4px 18px rgba(15, 23, 42, 0.04);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.09);
+}
+
+.dashboard-card h3 {
+    margin: 0;
+    color: #142b60;
+    font-size: 19px;
+}
+
+.dashboard-card p {
+    margin: 0 0 10px;
+    color: #64748b;
+    line-height: 1.55;
+}
+
+.dashboard-card button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    width: auto;
+    margin-top: auto;
+    padding: 11px 16px;
+
+    border-radius: 9px;
+}
+
+
+/* =========================================
+   ADMIN HEADER
+========================================= */
+
+.admin-dashboard {
+    padding-bottom: 20px;
+}
+
+.admin-page-header {
+    margin-bottom: 22px;
+}
+
+.admin-eyebrow {
+    margin-bottom: 8px !important;
+
+    color: #2563eb !important;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+}
+
+.admin-page-header .back-btn {
+    width: auto;
+    margin: 0;
+    padding: 11px 17px;
+    white-space: nowrap;
+}
+
+
+/* =========================================
+   HORIZONTAL ADMIN STATISTICS
+========================================= */
+
+.admin-dashboard .admin-stats {
+    display: grid !important;
+
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr)) !important;
+
+    gap: 16px !important;
+
+    margin: 0 0 24px !important;
+}
+
+.admin-dashboard .admin-stat-card {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+
+    min-width: 0;
+    padding: 22px;
+
+    background: #ffffff;
+    border: 1px solid #e7edf5;
+    border-radius: 15px;
+
+    text-align: left;
+
+    box-shadow: 0 4px 18px rgba(15, 23, 42, 0.04);
+}
+
+.admin-stat-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 40px;
+}
+
+.admin-stat-label {
+    color: #475569;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.admin-stat-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 38px;
+
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+
+    font-size: 18px;
+}
+
+.lost-icon {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.found-icon {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.pending-icon {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+.returned-icon {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.admin-dashboard .admin-stat-card h3 {
+    margin: 14px 0 5px;
+
+    color: #142b60;
+    font-size: clamp(30px, 3vw, 39px);
+    font-weight: 800;
+    line-height: 1;
+}
+
+.admin-dashboard .admin-stat-card > p {
+    margin: 0;
+
+    color: #94a3b8;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+
+/* =========================================
+   ADMIN CLAIM AND HANDOVER SECTIONS
+========================================= */
+
+.admin-dashboard .admin-section {
+    margin-bottom: 24px;
+    padding: 26px;
+
+    background: #ffffff;
+    border: 1px solid #e7edf5;
+    border-radius: 16px;
+
+    box-shadow: 0 4px 18px rgba(15, 23, 42, 0.04);
+}
+
+.admin-section-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+
+    margin-bottom: 22px;
+    padding-bottom: 18px;
+
+    border-bottom: 1px solid #e7edf5;
+}
+
+.admin-section-header h2 {
+    margin: 0 0 7px;
+
+    color: #142b60;
+    font-size: 21px;
+}
+
+.admin-section-header p {
+    margin: 0;
+
+    color: #64748b;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.admin-refresh-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    flex: 0 0 auto;
+
+    width: auto !important;
+    margin: 0 !important;
+    padding: 11px 16px;
+
+    border: 0;
+    border-radius: 9px;
+
+    background: #1d4ed8;
+    color: #ffffff;
+
+    font: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.admin-refresh-btn:hover {
+    background: #1e40af;
+}
+
+.admin-history-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+
+    padding: 8px 12px;
+
+    border-radius: 999px;
+
+    background: #ecfdf5;
+    color: #047857;
+
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+
+/* =========================================
+   CLAIM AND HANDOVER CARDS
+========================================= */
+
+.admin-dashboard .admin-claims-grid {
+    display: grid !important;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr)) !important;
+
+    gap: 16px;
+}
+
+.admin-dashboard .admin-claim-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    min-width: 0;
+    padding: 22px;
+
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+
+    overflow-wrap: anywhere;
+}
+
+.admin-dashboard .admin-claim-card h3 {
+    margin: 0 0 15px;
+
+    color: #142b60;
+    font-size: 19px;
+}
+
+.admin-dashboard .admin-claim-card p {
+    margin: 0 0 9px;
+
+    color: #475569;
+    font-size: 13px;
+    line-height: 1.55;
+}
+
+.admin-dashboard .admin-claim-card p strong {
+    color: #1e293b;
+}
+
+.admin-dashboard .admin-claim-card
+.claim-status {
+    display: inline-block;
+
+    margin-top: 10px;
+    padding: 6px 12px;
+
+    border-radius: 999px;
+
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.3px;
+}
+
+.admin-dashboard .admin-claim-card
+.claim-status.pending {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.admin-dashboard .admin-claim-card
+.claim-status.approved {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.admin-dashboard .admin-claim-card
+.claim-status.rejected {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.admin-dashboard .admin-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+
+    width: 100%;
+    margin-top: 18px;
+}
+
+.admin-dashboard .admin-actions button {
+    flex: 1;
+    min-width: 110px;
+    width: auto;
+
+    padding: 10px 13px;
+    border-radius: 8px;
+
+    font-size: 13px;
+    font-weight: 700;
+}
+
+
+/* =========================================
+   RESPONSIVE LAYOUT
+========================================= */
+
+@media (max-width: 950px) {
+
+    .admin-dashboard .admin-stats {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr)) !important;
+    }
+
+    .dashboard-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+}
+
+@media (max-width: 700px) {
+
+    .admin-dashboard .admin-claims-grid {
+        grid-template-columns:
+            minmax(0, 1fr) !important;
+    }
+
+    .dashboard-header {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 22px;
+    }
+
+    .dashboard-header-actions {
+        justify-content: flex-start;
+    }
+
+    .admin-section-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+}
+
+@media (max-width: 520px) {
+
+    .dashboard-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .admin-dashboard .admin-stats {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr)) !important;
+
+        gap: 10px !important;
+    }
+
+    .admin-dashboard .admin-stat-card {
+        padding: 15px;
+    }
+
+    .admin-stat-top {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .admin-dashboard .admin-stat-card h3 {
+        font-size: 29px;
+    }
+
+    .admin-dashboard .admin-section {
+        padding: 18px;
+    }
+
+    .admin-history-label {
+        display: none;
+    }
+
+}
