@@ -10,19 +10,21 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>Campus Lost &amp; Found Management System</title>
+    <title>Campus Lost & Found Management System</title>
 
     <link rel="stylesheet" href="css/style.css">
+
+    <link rel="stylesheet" href="css/matching.css">
 </head>
 
 <body>
 
-    <!-- =========================================
+    <!-- ======================================
          WEBSITE HEADER
-    ========================================== -->
+    ======================================= -->
 
     <header>
-        <h1>Campus Lost &amp; Found</h1>
+        <h1>Campus Lost & Found</h1>
 
         <p>
             Lost something? Found something?
@@ -31,30 +33,28 @@
     </header>
 
 
-    <!-- =========================================
+    <!-- ======================================
          HOME PAGE
-    ========================================== -->
+    ======================================= -->
 
     <main id="home-page" class="page">
 
         <section class="hero">
 
             <h2>
-                Campus Lost &amp; Found
-                Management System
+                Campus Lost & Found Management System
             </h2>
 
             <p>
-                A centralized system for reporting,
-                searching, claiming, and returning
-                lost and found items.
+                Report, search, claim, and return
+                lost and found items on campus.
             </p>
 
             <button
                 type="button"
                 id="get-started-btn"
             >
-                Get Started →
+                Get Started
             </button>
 
         </section>
@@ -62,9 +62,9 @@
     </main>
 
 
-    <!-- =========================================
+    <!-- ======================================
          LOGIN PAGE
-    ========================================== -->
+    ======================================= -->
 
     <main id="login-page" class="page hidden">
 
@@ -72,7 +72,7 @@
 
             <h2>Welcome Back</h2>
 
-            <p>Log in to your account.</p>
+            <p>Login to your account</p>
 
             <form id="login-form">
 
@@ -116,7 +116,7 @@
 
             <p class="auth-link">
                 <a href="#" id="login-back-home">
-                    ← Back to Home
+                    Back to Home
                 </a>
             </p>
 
@@ -125,9 +125,9 @@
     </main>
 
 
-    <!-- =========================================
+    <!-- ======================================
          REGISTRATION PAGE
-    ========================================== -->
+    ======================================= -->
 
     <main id="register-page" class="page hidden">
 
@@ -135,10 +135,7 @@
 
             <h2>Create Account</h2>
 
-            <p>
-                Register to use the Campus
-                Lost &amp; Found System.
-            </p>
+            <p>Register to use the Lost & Found System</p>
 
             <form id="register-form">
 
@@ -209,7 +206,7 @@
 
             <p class="auth-link">
                 <a href="#" id="register-back-home">
-                    ← Back to Home
+                    Back to Home
                 </a>
             </p>
 
@@ -218,15 +215,13 @@
     </main>
 
 
-    <!-- =========================================
+    <!-- ======================================
          USER DASHBOARD
-    ========================================== -->
+    ======================================= -->
 
     <main id="dashboard-page" class="page hidden">
 
         <section class="dashboard-container">
-
-            <!-- DASHBOARD HEADER -->
 
             <div class="dashboard-header">
 
@@ -235,167 +230,97 @@
                         Welcome!
                     </h2>
 
-                    <p>
-                        Campus Lost &amp; Found Dashboard
-                    </p>
+                    <p>Campus Lost & Found Dashboard</p>
                 </div>
 
-
-                <!-- TOP-RIGHT ACTION BUTTONS -->
-
-                <div class="dashboard-header-actions">
-
-                    <!--
-                        admin.js shows this only
-                        when the logged-in user
-                        has the admin role.
-                    -->
-
-                    <div
-                        id="admin-access"
-                        class="hidden"
-                    >
-
-                        <button
-                            type="button"
-                            id="open-admin-btn"
-                            class="admin-header-btn"
-                        >
-                            <span aria-hidden="true">⚙</span>
-                            Admin Panel
-                        </button>
-
-                    </div>
-
-
-                    <button
-                        type="button"
-                        id="logout-btn"
-                    >
-                        Logout
-                    </button>
-
-                </div>
+                <button
+                    type="button"
+                    id="logout-btn"
+                >
+                    Logout
+                </button>
 
             </div>
 
 
-            <!-- DASHBOARD FEATURE CARDS -->
-
             <div class="dashboard-grid">
-
-
-                <!-- REPORT LOST -->
 
                 <div class="dashboard-card">
 
-                    <h3>
-                        <span aria-hidden="true">🔎</span>
-                        Report Lost Item
-                    </h3>
+                    <h3>Report Lost Item</h3>
 
-                    <p>
-                        Create a report for an item
-                        you have lost on campus.
-                    </p>
+                    <p>Report an item that you have lost.</p>
 
                     <button
                         type="button"
                         id="open-lost-btn"
                     >
-                        <span aria-hidden="true">＋</span>
                         Report Lost
                     </button>
 
                 </div>
 
 
-                <!-- REPORT FOUND -->
-
                 <div class="dashboard-card">
 
-                    <h3>
-                        <span aria-hidden="true">📦</span>
-                        Report Found Item
-                    </h3>
+                    <h3>Report Found Item</h3>
 
-                    <p>
-                        Report an item you found
-                        and record where it is kept.
-                    </p>
+                    <p>Report an item that you have found.</p>
 
                     <button
                         type="button"
                         id="open-found-btn"
                     >
-                        <span aria-hidden="true">＋</span>
                         Report Found
                     </button>
 
                 </div>
 
 
-                <!-- SEARCH ITEMS -->
-
                 <div class="dashboard-card">
 
-                    <h3>
-                        <span aria-hidden="true">🔍</span>
-                        Search Items
-                    </h3>
+                    <h3>Search Items</h3>
 
                     <p>
                         Browse lost and found reports
-                        and discover possible matches.
+                        and check possible matches.
                     </p>
 
                     <button
                         type="button"
                         id="open-search-btn"
                     >
-                        <span aria-hidden="true">🔍</span>
                         Search Items
                     </button>
 
                 </div>
 
 
-                <!-- MY REPORTS -->
-
                 <div class="dashboard-card">
 
-                    <h3>
-                        <span aria-hidden="true">📋</span>
-                        My Reports
-                    </h3>
+                    <h3>My Reports</h3>
 
                     <p>
-                        View the lost and found
-                        reports you submitted.
+                        View, edit, or remove
+                        your own eligible reports.
                     </p>
 
                     <button
                         type="button"
                         id="open-reports-btn"
                     >
-                        <span aria-hidden="true">▤</span>
                         My Reports
                     </button>
 
                 </div>
 
 
-                <!-- MY CLAIMS -->
-
                 <div class="dashboard-card">
 
-                    <h3>
-                        <span aria-hidden="true">✅</span>
-                        My Claims
-                    </h3>
+                    <h3>My Claims</h3>
 
                     <p>
-                        Track ownership claims
+                        Track your ownership claims
                         and their verification status.
                     </p>
 
@@ -403,11 +328,34 @@
                         type="button"
                         id="open-claims-btn"
                     >
-                        <span aria-hidden="true">✓</span>
                         My Claims
                     </button>
 
                 </div>
+
+            </div>
+
+
+            <!-- ADMINISTRATOR ACCESS -->
+
+            <div
+                id="admin-access"
+                class="admin-access hidden"
+            >
+
+                <h3>Administrator Management</h3>
+
+                <p>
+                    Review ownership claims
+                    and manage item handovers.
+                </p>
+
+                <button
+                    type="button"
+                    id="open-admin-btn"
+                >
+                    Open Admin Dashboard
+                </button>
 
             </div>
 
@@ -416,9 +364,9 @@
     </main>
 
 
-    <!-- =========================================
-         REPORT LOST ITEM PAGE
-    ========================================== -->
+    <!-- ======================================
+         REPORT LOST ITEM
+    ======================================= -->
 
     <main id="lost-page" class="page hidden">
 
@@ -434,17 +382,11 @@
 
             <h2>Report Lost Item</h2>
 
-            <p>
-                Provide information about
-                the item you lost.
-            </p>
+            <p>Enter information about your lost item.</p>
 
             <form id="lost-form">
 
-
-                <label for="lost-name">
-                    Item Name
-                </label>
+                <label for="lost-name">Item Name</label>
 
                 <input
                     type="text"
@@ -504,9 +446,7 @@
                 ></textarea>
 
 
-                <label for="lost-color">
-                    Color
-                </label>
+                <label for="lost-color">Color</label>
 
                 <input
                     type="text"
@@ -516,9 +456,7 @@
                 >
 
 
-                <label for="lost-date">
-                    Date Lost
-                </label>
+                <label for="lost-date">Date Lost</label>
 
                 <input
                     type="date"
@@ -540,8 +478,6 @@
                 >
 
 
-                <!-- OPTIONAL PHOTO -->
-
                 <label for="lost-photo">
                     Item Photo (Optional)
                 </label>
@@ -553,10 +489,8 @@
                 >
 
                 <p class="form-hint">
-                    Upload a JPEG, PNG, or WebP photo.
-                    Maximum size: 2 MB.
-                    Avoid including sensitive personal
-                    information in the photo.
+                    JPEG, PNG, or WebP. Maximum 2 MB.
+                    Do not upload sensitive personal information.
                 </p>
 
 
@@ -571,9 +505,9 @@
     </main>
 
 
-    <!-- =========================================
-         REPORT FOUND ITEM PAGE
-    ========================================== -->
+    <!-- ======================================
+         REPORT FOUND ITEM
+    ======================================= -->
 
     <main id="found-page" class="page hidden">
 
@@ -590,16 +524,13 @@
             <h2>Report Found Item</h2>
 
             <p>
-                Provide information about the
-                item you found and where it is kept.
+                Describe the item you found
+                and where it is currently kept.
             </p>
 
             <form id="found-form">
 
-
-                <label for="found-name">
-                    Item Name
-                </label>
+                <label for="found-name">Item Name</label>
 
                 <input
                     type="text"
@@ -659,9 +590,7 @@
                 ></textarea>
 
 
-                <label for="found-color">
-                    Color
-                </label>
+                <label for="found-color">Color</label>
 
                 <input
                     type="text"
@@ -671,9 +600,7 @@
                 >
 
 
-                <label for="found-date">
-                    Date Found
-                </label>
+                <label for="found-date">Date Found</label>
 
                 <input
                     type="date"
@@ -709,14 +636,11 @@
 
 
                 <p class="form-hint">
-                    Use a designated school office
-                    as the holding location.
-                    Do not publish a private address
-                    or personal contact number.
+                    Use a designated school office as
+                    the holding location. Do not publish
+                    your home address or contact number.
                 </p>
 
-
-                <!-- OPTIONAL PHOTO -->
 
                 <label for="found-photo">
                     Item Photo (Optional)
@@ -729,10 +653,9 @@
                 >
 
                 <p class="form-hint">
-                    Upload a JPEG, PNG, or WebP photo.
-                    Maximum size: 2 MB.
-                    Avoid showing student IDs,
-                    bank cards, or other sensitive details.
+                    JPEG, PNG, or WebP. Maximum 2 MB.
+                    Do not upload student IDs,
+                    bank cards, or sensitive information.
                 </p>
 
 
@@ -747,9 +670,9 @@
     </main>
 
 
-    <!-- =========================================
-         SEARCH ITEMS PAGE
-    ========================================== -->
+    <!-- ======================================
+         SEARCH ITEMS
+    ======================================= -->
 
     <main id="search-page" class="page hidden">
 
@@ -763,14 +686,11 @@
                 ← Back to Dashboard
             </button>
 
-            <h2>
-                <span aria-hidden="true">🔍</span>
-                Search Lost and Found Items
-            </h2>
+            <h2>Search Lost and Found Items</h2>
 
             <p>
-                Browse reports and find
-                possible matches.
+                Browse item reports and view possible
+                matches with explanations.
             </p>
 
 
@@ -779,13 +699,13 @@
                 <input
                     type="search"
                     id="item-search"
-                    placeholder="Search by name, category, or color"
+                    placeholder="Search by item name, category, or color"
                     aria-label="Search items"
                 >
 
                 <select
                     id="item-filter"
-                    aria-label="Filter item reports"
+                    aria-label="Filter items"
                 >
 
                     <option value="all">
@@ -815,9 +735,9 @@
     </main>
 
 
-    <!-- =========================================
-         MY REPORTS PAGE
-    ========================================== -->
+    <!-- ======================================
+         MY REPORTS
+    ======================================= -->
 
     <main id="reports-page" class="page hidden">
 
@@ -831,15 +751,13 @@
                 ← Back to Dashboard
             </button>
 
-            <h2>
-                <span aria-hidden="true">📋</span>
-                My Reports
-            </h2>
+            <h2>My Reports</h2>
 
             <p>
-                View the lost and found
-                reports you submitted.
+                View and manage the reports
+                you submitted.
             </p>
+
 
             <div
                 id="my-reports-results"
@@ -851,9 +769,9 @@
     </main>
 
 
-    <!-- =========================================
-         CLAIM FOUND ITEM PAGE
-    ========================================== -->
+    <!-- ======================================
+         CLAIM FOUND ITEM
+    ======================================= -->
 
     <main id="claim-page" class="page hidden">
 
@@ -861,8 +779,8 @@
 
             <button
                 type="button"
-                id="claim-back-btn"
                 class="back-btn"
+                id="claim-back-btn"
             >
                 ← Back to Search
             </button>
@@ -870,8 +788,8 @@
             <h2>Claim Found Item</h2>
 
             <p>
-                Provide identifying details
-                to help verify your ownership.
+                Provide information to help
+                verify your ownership.
             </p>
 
 
@@ -893,6 +811,7 @@
                     id="claim-found-id"
                 >
 
+
                 <label for="claim-description">
                     Proof of Ownership
                 </label>
@@ -907,12 +826,11 @@
                 ></textarea>
 
                 <p class="form-hint">
-                    Your description is intended
-                    for administrator verification.
-                    Do not include passwords, PINs,
-                    government ID numbers, or
-                    banking details.
+                    Do not enter passwords, PINs,
+                    government ID numbers,
+                    or banking details.
                 </p>
+
 
                 <button type="submit">
                     Submit Claim Request
@@ -925,9 +843,9 @@
     </main>
 
 
-    <!-- =========================================
-         MY CLAIMS PAGE
-    ========================================== -->
+    <!-- ======================================
+         MY CLAIMS
+    ======================================= -->
 
     <main id="claims-page" class="page hidden">
 
@@ -941,15 +859,12 @@
                 ← Back to Dashboard
             </button>
 
-            <h2>
-                <span aria-hidden="true">✅</span>
-                My Claims
-            </h2>
+            <h2>My Claims</h2>
 
             <p>
-                Track the status of your
-                submitted ownership claims.
+                Track your submitted ownership claims.
             </p>
+
 
             <div
                 id="my-claims-results"
@@ -961,33 +876,20 @@
     </main>
 
 
-    <!-- =========================================
-         REDESIGNED ADMIN DASHBOARD
-    ========================================== -->
+    <!-- ======================================
+         ADMIN DASHBOARD
+    ======================================= -->
 
     <main id="admin-page" class="page hidden">
 
-        <section class="dashboard-container admin-dashboard">
+        <section class="dashboard-container">
 
-
-            <!-- ADMIN HEADER -->
-
-            <div class="dashboard-header admin-page-header">
+            <div class="dashboard-header">
 
                 <div>
+                    <h2>Administrator Dashboard</h2>
 
-                    <p class="admin-eyebrow">
-                        MANAGEMENT OVERVIEW
-                    </p>
-
-                    <h2>
-                        Administrator Dashboard
-                    </h2>
-
-                    <p>
-                        Campus Lost &amp; Found Management
-                    </p>
-
+                    <p>Campus Lost & Found Management</p>
                 </div>
 
                 <button
@@ -995,219 +897,101 @@
                     id="admin-back-btn"
                     class="back-btn"
                 >
-                    ← Back to Dashboard
+                    Back to Dashboard
                 </button>
 
             </div>
 
 
-            <!-- FOUR HORIZONTAL STATISTIC CARDS -->
-
             <div class="admin-stats">
 
-
-                <!-- LOST REPORTS -->
-
                 <div class="admin-stat-card">
 
-                    <div class="admin-stat-top">
+                    <h3 id="admin-lost-count">0</h3>
 
-                        <span
-                            class="admin-stat-icon lost-icon"
-                            aria-hidden="true"
-                        >
-                            🔍
-                        </span>
-
-                        <span class="admin-stat-label">
-                            Lost Reports
-                        </span>
-
-                    </div>
-
-                    <h3 id="admin-lost-count">
-                        0
-                    </h3>
-
-                    <p>Total reported lost items</p>
+                    <p>Lost Reports</p>
 
                 </div>
 
 
-                <!-- FOUND REPORTS -->
-
                 <div class="admin-stat-card">
 
-                    <div class="admin-stat-top">
+                    <h3 id="admin-found-count">0</h3>
 
-                        <span
-                            class="admin-stat-icon found-icon"
-                            aria-hidden="true"
-                        >
-                            📦
-                        </span>
-
-                        <span class="admin-stat-label">
-                            Found Reports
-                        </span>
-
-                    </div>
-
-                    <h3 id="admin-found-count">
-                        0
-                    </h3>
-
-                    <p>Total reported found items</p>
+                    <p>Found Reports</p>
 
                 </div>
 
 
-                <!-- PENDING CLAIMS -->
-
                 <div class="admin-stat-card">
 
-                    <div class="admin-stat-top">
+                    <h3 id="admin-pending-count">0</h3>
 
-                        <span
-                            class="admin-stat-icon pending-icon"
-                            aria-hidden="true"
-                        >
-                            ◷
-                        </span>
-
-                        <span class="admin-stat-label">
-                            Pending Claims
-                        </span>
-
-                    </div>
-
-                    <h3 id="admin-pending-count">
-                        0
-                    </h3>
-
-                    <p>Awaiting administrator review</p>
+                    <p>Pending Claims</p>
 
                 </div>
 
 
-                <!-- RETURNED ITEMS -->
-
                 <div class="admin-stat-card">
 
-                    <div class="admin-stat-top">
+                    <h3 id="admin-returned-count">0</h3>
 
-                        <span
-                            class="admin-stat-icon returned-icon"
-                            aria-hidden="true"
-                        >
-                            ✓
-                        </span>
-
-                        <span class="admin-stat-label">
-                            Returned Items
-                        </span>
-
-                    </div>
-
-                    <h3 id="admin-returned-count">
-                        0
-                    </h3>
-
-                    <p>Completed item handovers</p>
+                    <p>Returned Items</p>
 
                 </div>
 
             </div>
 
 
-            <!-- OWNERSHIP CLAIMS -->
+            <div class="admin-section">
 
-            <section class="admin-section">
+                <h2>Ownership Claims</h2>
 
-                <div class="admin-section-header">
+                <p>
+                    Review ownership requests,
+                    approve or reject claims,
+                    and record completed handovers.
+                </p>
 
-                    <div>
-
-                        <h2>Ownership Claims</h2>
-
-                        <p>
-                            Review claims, verify ownership,
-                            and manage item returns.
-                        </p>
-
-                    </div>
-
-
-                    <!-- RIGHT-ALIGNED REFRESH BUTTON -->
-
-                    <button
-                        type="button"
-                        id="admin-refresh-btn"
-                        class="admin-refresh-btn"
-                    >
-                        <span aria-hidden="true">↻</span>
-                        Refresh Claims
-                    </button>
-
-                </div>
-
-
-                <!-- CLAIM CARDS LOADED BY admin.js -->
+                <button
+                    type="button"
+                    id="admin-refresh-btn"
+                >
+                    Refresh Claims
+                </button>
 
                 <div
                     id="admin-claims-results"
                     class="admin-claims-grid"
                 ></div>
 
-            </section>
+            </div>
 
 
-            <!-- COMPLETED HANDOVERS -->
+            <div class="admin-section">
 
-            <section class="admin-section">
+                <h2>Completed Handovers</h2>
 
-                <div class="admin-section-header">
-
-                    <div>
-
-                        <h2>Completed Handovers</h2>
-
-                        <p>
-                            A record of items successfully
-                            returned to their claimants.
-                        </p>
-
-                    </div>
-
-
-                    <span class="admin-history-label">
-
-                        <span aria-hidden="true">✓</span>
-
-                        Return History
-
-                    </span>
-
-                </div>
-
-
-                <!-- HANDOVER CARDS LOADED BY admin.js -->
+                <p>
+                    View the history of items
+                    returned to their owners.
+                </p>
 
                 <div
                     id="admin-handovers-results"
                     class="admin-claims-grid"
                 ></div>
 
-            </section>
+            </div>
 
         </section>
 
     </main>
 
 
-    <!-- =========================================
-         NOTIFICATION MESSAGE
-    ========================================== -->
+    <!-- ======================================
+         NOTIFICATIONS
+    ======================================= -->
 
     <div
         id="notification"
@@ -1217,52 +1001,35 @@
     ></div>
 
 
-    <!-- =========================================
+    <!-- ======================================
          FOOTER
-    ========================================== -->
+    ======================================= -->
 
     <footer>
+
         <p>
-            Campus Lost &amp; Found
-            Management System
+            Campus Lost & Found Management System
         </p>
+
     </footer>
 
 
-    <!-- =========================================
+    <!-- ======================================
          JAVASCRIPT FILES
+         KEEP THIS ORDER
+    ======================================= -->
 
-         KEEP THIS ORDER!
-    ========================================== -->
-
-    <!-- SUPABASE LIBRARY -->
-
-    <script
-        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
-    ></script>
-
-
-    <!-- YOUR SUPABASE CONFIGURATION -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <script src="js/supabase.js"></script>
 
-
-    <!-- PHOTO UPLOADING FEATURES -->
-
     <script src="js/photo.js"></script>
 
-
-    <!-- MAIN WEBSITE FUNCTIONS -->
-
     <script src="js/app.js"></script>
-    
-
-    <!-- REPORT EDITING AND REMOVAL -->
 
     <script src="js/reports.js"></script>
-    
 
-    <!-- ADMINISTRATOR FUNCTIONS -->
+    <script src="js/matching.js"></script>
 
     <script src="js/admin.js"></script>
 
