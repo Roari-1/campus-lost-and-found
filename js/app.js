@@ -1699,6 +1699,128 @@ function renderItems(items, containerId) {
         return;
 
     }
+status.textContent =
+    "Status: " +
+    item.status.replaceAll("_", " ");
+
+card.appendChild(status);
+
+
+
+// ========================================
+// PHASE 5 — MATCHING AND CLAIM BUTTONS
+// ========================================
+
+// Show interactive matching and claiming
+// buttons only on the Search Items page.
+
+if (containerId === "search-results") {
+
+    // LOST ITEM: Find possible matches.
+
+    if (
+        item.report_type === "lost" &&
+        item.status === "lost"
+    ) {
+
+        const matches =
+            findPossibleMatches(item);
+
+
+        if (matches.length > 0) {
+
+            const matchLabel =
+                document.createElement("span");
+
+            matchLabel.className =
+                "possible-match";
+
+            matchLabel.textContent =
+                matches.length +
+                " POSSIBLE MATCH" +
+                (matches.length === 1 ? "" : "ES");
+
+
+            card.appendChild(matchLabel);
+
+
+            const matchButton =
+                document.createElement("button");
+
+            matchButton.className =
+                "match-btn";
+
+            matchButton.textContent =
+                "View Possible Matches";
+
+
+            matchButton.addEventListener(
+                "click",
+                function() {
+
+                    // Show matching found items.
+
+                    renderItems(
+                        matches,
+                        "search-results"
+                    );
+
+
+                    document.getElementById(
+                        "search-results"
+                    ).scrollIntoView({
+                        behavior: "smooth"
+                    });
+
+                }
+            );
+
+
+            card.appendChild(matchButton);
+
+        }
+
+    }
+
+
+    // FOUND ITEM: Allow ownership claim.
+
+    if (
+        item.report_type === "found" &&
+        item.status === "found" &&
+        item.user_id !== currentUser?.id
+    ) {
+
+        const claimButton =
+            document.createElement("button");
+
+        claimButton.className =
+            "claim-btn";
+
+        claimButton.textContent =
+            "Claim This Item";
+
+
+        claimButton.addEventListener(
+            "click",
+            function() {
+
+                openClaimForm(item);
+
+            }
+        );
+
+
+        card.appendChild(claimButton);
+
+    }
+
+}
+
+
+// Add the completed card to the page.
+
+container.appendChild(card);
 
 
     items.forEach(function(item) {
