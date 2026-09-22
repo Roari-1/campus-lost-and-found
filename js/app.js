@@ -1,26 +1,29 @@
 
-/* ================================================
+/* =====================================================
    CAMPUS LOST AND FOUND MANAGEMENT SYSTEM
 
-   COMPLETE JAVASCRIPT - PHASE 5
+   COMPLETE APP.JS - PHASE 7
 
-   Features:
-   - Registration and Login
+   FEATURES:
+   - User Registration and Login
    - User Dashboard
    - Lost Item Reporting
    - Found Item Reporting
+   - Photo Uploading
    - Search and Filter
    - My Reports
    - Possible Item Matching
    - Ownership Claims
    - My Claims
    - Logout
-================================================ */
+
+   Admin features are handled by js/admin.js.
+===================================================== */
 
 
-// ================================================
+// =====================================================
 // 1. GLOBAL VARIABLES
-// ================================================
+// =====================================================
 
 let currentUser = null;
 
@@ -33,9 +36,9 @@ let notificationTimer = null;
 let currentPageRequest = 0;
 
 
-// ================================================
+// =====================================================
 // 2. GET HTML ELEMENTS
-// ================================================
+// =====================================================
 
 const pages = document.querySelectorAll(".page");
 
@@ -67,9 +70,9 @@ const itemFilter =
     document.getElementById("item-filter");
 
 
-// ================================================
+// =====================================================
 // 3. PAGE NAVIGATION
-// ================================================
+// =====================================================
 
 function showPage(pageId) {
 
@@ -95,9 +98,9 @@ function showPage(pageId) {
 }
 
 
-// ================================================
+// =====================================================
 // 4. NOTIFICATION SYSTEM
-// ================================================
+// =====================================================
 
 function showNotification(
     message,
@@ -132,9 +135,9 @@ function showNotification(
 }
 
 
-// ================================================
+// =====================================================
 // 5. GET AUTHENTICATED USER
-// ================================================
+// =====================================================
 
 async function getAuthenticatedUser() {
 
@@ -158,9 +161,9 @@ async function getAuthenticatedUser() {
 }
 
 
-// ================================================
+// =====================================================
 // 6. USER DASHBOARD
-// ================================================
+// =====================================================
 
 function showDashboard(user) {
 
@@ -184,12 +187,21 @@ function showDashboard(user) {
 
     showPage("dashboard-page");
 
+
+    // Refresh administrator access.
+
+    if (typeof checkAdminRole === "function") {
+
+        checkAdminRole();
+
+    }
+
 }
 
 
-// ================================================
+// =====================================================
 // 7. HOME AND AUTHENTICATION NAVIGATION
-// ================================================
+// =====================================================
 
 document.getElementById("get-started-btn")
     .addEventListener("click", function() {
@@ -247,9 +259,9 @@ document.getElementById("register-back-home")
     });
 
 
-// ================================================
+// =====================================================
 // 8. USER REGISTRATION
-// ================================================
+// =====================================================
 
 registerForm.addEventListener(
     "submit",
@@ -400,9 +412,9 @@ registerForm.addEventListener(
 );
 
 
-// ================================================
+// =====================================================
 // 9. USER LOGIN
-// ================================================
+// =====================================================
 
 loginForm.addEventListener(
     "submit",
@@ -491,9 +503,9 @@ loginForm.addEventListener(
 );
 
 
-// ================================================
+// =====================================================
 // 10. USER LOGOUT
-// ================================================
+// =====================================================
 
 document.getElementById("logout-btn")
     .addEventListener("click", async function() {
@@ -536,9 +548,9 @@ document.getElementById("logout-btn")
     });
 
 
-// ================================================
+// =====================================================
 // 11. DASHBOARD BUTTONS
-// ================================================
+// =====================================================
 
 document.getElementById("open-lost-btn")
     .addEventListener("click", function() {
@@ -586,9 +598,9 @@ document.getElementById("open-claims-btn")
     });
 
 
-// ================================================
+// =====================================================
 // 12. BACK TO DASHBOARD
-// ================================================
+// =====================================================
 
 document.querySelectorAll(
     "[data-back-dashboard]"
@@ -622,9 +634,9 @@ document.querySelectorAll(
 });
 
 
-// ================================================
-// 13. SUBMIT LOST ITEM REPORT
-// ================================================
+// =====================================================
+// 13. SUBMIT LOST ITEM REPORT WITH OPTIONAL PHOTO
+// =====================================================
 
 lostForm.addEventListener(
     "submit",
@@ -648,6 +660,8 @@ lostForm.addEventListener(
             const user =
                 await getAuthenticatedUser();
 
+
+            // Get form values.
 
             const report = {
 
@@ -688,6 +702,8 @@ lostForm.addEventListener(
             };
 
 
+            // Validate required fields before uploading.
+
             if (
                 !report.item_name ||
                 !report.category ||
@@ -701,6 +717,34 @@ lostForm.addEventListener(
 
             }
 
+
+            // Get optional photo.
+
+            const photo =
+                document.getElementById(
+                    "lost-photo"
+                ).files[0];
+
+
+            validateItemPhoto(photo);
+
+
+            // Upload photo if selected.
+
+            const photoPath =
+                await uploadItemPhoto(
+                    photo,
+                    user.id,
+                    "lost"
+                );
+
+
+            // Save photo path with report.
+
+            report.photo_url = photoPath;
+
+
+            // Save report to Supabase.
 
             const { error } =
                 await supabaseClient
@@ -728,7 +772,10 @@ lostForm.addEventListener(
 
         } catch (error) {
 
-            console.error(error);
+            console.error(
+                "Lost report error:",
+                error
+            );
 
             showNotification(
                 error.message,
@@ -748,9 +795,9 @@ lostForm.addEventListener(
 );
 
 
-// ================================================
-// 14. SUBMIT FOUND ITEM REPORT
-// ================================================
+// =====================================================
+// 14. SUBMIT FOUND ITEM REPORT WITH OPTIONAL PHOTO
+// =====================================================
 
 foundForm.addEventListener(
     "submit",
@@ -774,6 +821,8 @@ foundForm.addEventListener(
             const user =
                 await getAuthenticatedUser();
 
+
+            // Get form values.
 
             const report = {
 
@@ -819,6 +868,8 @@ foundForm.addEventListener(
             };
 
 
+            // Validate required fields.
+
             if (
                 !report.item_name ||
                 !report.category ||
@@ -833,6 +884,34 @@ foundForm.addEventListener(
 
             }
 
+
+            // Get optional photo.
+
+            const photo =
+                document.getElementById(
+                    "found-photo"
+                ).files[0];
+
+
+            validateItemPhoto(photo);
+
+
+            // Upload photo if selected.
+
+            const photoPath =
+                await uploadItemPhoto(
+                    photo,
+                    user.id,
+                    "found"
+                );
+
+
+            // Save photo path with report.
+
+            report.photo_url = photoPath;
+
+
+            // Save report to Supabase.
 
             const { error } =
                 await supabaseClient
@@ -860,7 +939,10 @@ foundForm.addEventListener(
 
         } catch (error) {
 
-            console.error(error);
+            console.error(
+                "Found report error:",
+                error
+            );
 
             showNotification(
                 error.message,
@@ -880,9 +962,9 @@ foundForm.addEventListener(
 );
 
 
-// ================================================
+// =====================================================
 // 15. LOAD ALL LOST AND FOUND ITEMS
-// ================================================
+// =====================================================
 
 async function loadSearchItems() {
 
@@ -969,8 +1051,6 @@ async function loadSearchItems() {
             );
 
 
-        // Store all reports for matching.
-
         allSearchItems = [
 
             ...lostItems,
@@ -979,8 +1059,6 @@ async function loadSearchItems() {
 
         ];
 
-
-        // Sort newest reports first.
 
         allSearchItems.sort(function(a, b) {
 
@@ -992,17 +1070,12 @@ async function loadSearchItems() {
         });
 
 
-        // Do not overwrite another page
-        // if the user navigated away.
-
         if (requestId !== currentPageRequest) {
 
             return;
 
         }
 
-
-        // Restore the full search results.
 
         currentSearchItems = allSearchItems;
 
@@ -1015,7 +1088,10 @@ async function loadSearchItems() {
 
     } catch (error) {
 
-        console.error(error);
+        console.error(
+            "Search error:",
+            error
+        );
 
         if (requestId !== currentPageRequest) {
 
@@ -1041,9 +1117,9 @@ async function loadSearchItems() {
 }
 
 
-// ================================================
+// =====================================================
 // 16. SEARCH AND FILTER ITEMS
-// ================================================
+// =====================================================
 
 function filterSearchItems() {
 
@@ -1096,15 +1172,11 @@ function filterSearchItems() {
 }
 
 
-// Search input
-
 searchInput.addEventListener(
     "input",
     filterSearchItems
 );
 
-
-// Item type filter
 
 itemFilter.addEventListener(
     "change",
@@ -1112,9 +1184,9 @@ itemFilter.addEventListener(
 );
 
 
-// ================================================
+// =====================================================
 // 17. FIND POSSIBLE MATCHES
-// ================================================
+// =====================================================
 
 function findPossibleMatches(lostItem) {
 
@@ -1127,62 +1199,49 @@ function findPossibleMatches(lostItem) {
     }
 
 
-    const matches =
-        allSearchItems.filter(function(item) {
+    return allSearchItems.filter(function(item) {
 
-            // Only available found items.
+        if (
+            item.report_type !== "found" ||
+            item.status !== "found"
+        ) {
 
-            if (
-                item.report_type !== "found" ||
-                item.status !== "found"
-            ) {
+            return false;
 
-                return false;
-
-            }
+        }
 
 
-            // Compare item name.
-
-            const nameMatches =
-                normalize(item.item_name) ===
-                normalize(lostItem.item_name);
+        const nameMatches =
+            normalize(item.item_name) ===
+            normalize(lostItem.item_name);
 
 
-            // Compare category.
-
-            const categoryMatches =
-                normalize(item.category) ===
-                normalize(lostItem.category);
+        const categoryMatches =
+            normalize(item.category) ===
+            normalize(lostItem.category);
 
 
-            // Compare color when both
-            // reports specify a color.
-
-            const colorMatches =
-                !item.color ||
-                !lostItem.color ||
-                normalize(item.color) ===
-                normalize(lostItem.color);
+        const colorMatches =
+            !item.color ||
+            !lostItem.color ||
+            normalize(item.color) ===
+            normalize(lostItem.color);
 
 
-            return (
-                nameMatches &&
-                categoryMatches &&
-                colorMatches
-            );
+        return (
+            nameMatches &&
+            categoryMatches &&
+            colorMatches
+        );
 
-        });
-
-
-    return matches;
+    });
 
 }
 
 
-// ================================================
+// =====================================================
 // 18. DISPLAY LOST AND FOUND ITEM CARDS
-// ================================================
+// =====================================================
 
 function renderItems(items, containerId) {
 
@@ -1210,11 +1269,11 @@ function renderItems(items, containerId) {
     }
 
 
-    // IMPORTANT:
-    // Every item card and its buttons
-    // must be created inside this loop.
-
     items.forEach(function(item) {
+
+        // =========================================
+        // CREATE ITEM CARD
+        // =========================================
 
         const card =
             document.createElement("article");
@@ -1222,7 +1281,9 @@ function renderItems(items, containerId) {
         card.className = "item-card";
 
 
+        // =========================================
         // ITEM TYPE BADGE
+        // =========================================
 
         const badge =
             document.createElement("span");
@@ -1238,7 +1299,9 @@ function renderItems(items, containerId) {
         card.appendChild(badge);
 
 
+        // =========================================
         // ITEM NAME
+        // =========================================
 
         const title =
             document.createElement("h3");
@@ -1249,7 +1312,47 @@ function renderItems(items, containerId) {
         card.appendChild(title);
 
 
+        // =========================================
+        // DISPLAY ITEM PHOTO
+        // =========================================
+
+        if (item.photo_url) {
+
+            // Load the photo asynchronously.
+
+            createItemPhotoElement(
+                item.photo_url
+            ).then(function(image) {
+
+                if (
+                    image &&
+                    card.isConnected
+                ) {
+
+                    // Place photo after the item name.
+
+                    title.insertAdjacentElement(
+                        "afterend",
+                        image
+                    );
+
+                }
+
+            }).catch(function(error) {
+
+                console.error(
+                    "Unable to display item photo:",
+                    error
+                );
+
+            });
+
+        }
+
+
+        // =========================================
         // HELPER FOR ITEM DETAILS
+        // =========================================
 
         function addDetail(label, value) {
 
@@ -1294,7 +1397,9 @@ function renderItems(items, containerId) {
         }
 
 
+        // =========================================
         // ITEM INFORMATION
+        // =========================================
 
         addDetail(
             "Category",
@@ -1334,7 +1439,9 @@ function renderItems(items, containerId) {
         }
 
 
+        // =========================================
         // ITEM DESCRIPTION
+        // =========================================
 
         if (item.description) {
 
@@ -1352,7 +1459,9 @@ function renderItems(items, containerId) {
         }
 
 
+        // =========================================
         // ITEM STATUS
+        // =========================================
 
         const status =
             document.createElement("p");
@@ -1368,17 +1477,14 @@ function renderItems(items, containerId) {
         card.appendChild(status);
 
 
-        // ====================================
+        // =========================================
         // POSSIBLE MATCH AND CLAIM BUTTONS
-        // ====================================
-
-        // Buttons only appear on Search Items.
+        // =========================================
 
         if (containerId === "search-results") {
 
 
-            // LOST ITEM:
-            // DISPLAY POSSIBLE MATCHES
+            // LOST ITEM: SHOW POSSIBLE MATCHES
 
             if (
                 item.report_type === "lost" &&
@@ -1423,20 +1529,14 @@ function renderItems(items, containerId) {
                         "click",
                         function() {
 
-                            // Store the matched items.
-
                             currentSearchItems =
                                 matches;
 
-
-                            // Reset search controls.
 
                             searchInput.value = "";
 
                             itemFilter.value = "all";
 
-
-                            // Display matching found items.
 
                             filterSearchItems();
 
@@ -1453,8 +1553,7 @@ function renderItems(items, containerId) {
             }
 
 
-            // FOUND ITEM:
-            // DISPLAY CLAIM BUTTON
+            // FOUND ITEM: SHOW CLAIM BUTTON
 
             if (
                 item.report_type === "found" &&
@@ -1491,7 +1590,7 @@ function renderItems(items, containerId) {
         }
 
 
-        // ADD COMPLETED CARD TO PAGE
+        // Add completed card to the page.
 
         container.appendChild(card);
 
@@ -1500,9 +1599,9 @@ function renderItems(items, containerId) {
 }
 
 
-// ================================================
+// =====================================================
 // 19. LOAD MY REPORTS
-// ================================================
+// =====================================================
 
 async function loadMyReports() {
 
@@ -1621,7 +1720,10 @@ async function loadMyReports() {
 
     } catch (error) {
 
-        console.error(error);
+        console.error(
+            "My Reports error:",
+            error
+        );
 
         if (requestId !== currentPageRequest) {
 
@@ -1647,9 +1749,9 @@ async function loadMyReports() {
 }
 
 
-// ================================================
+// =====================================================
 // 20. OPEN OWNERSHIP CLAIM FORM
-// ================================================
+// =====================================================
 
 function openClaimForm(item) {
 
@@ -1684,21 +1786,15 @@ function openClaimForm(item) {
     claimForm.reset();
 
 
-    // Store selected found item ID.
-
     document.getElementById(
         "claim-found-id"
     ).value = item.id;
 
 
-    // Display selected item name.
-
     document.getElementById(
         "claim-item-name"
     ).textContent = item.item_name;
 
-
-    // Display basic item details.
 
     document.getElementById(
         "claim-item-details"
@@ -1719,9 +1815,9 @@ function openClaimForm(item) {
 }
 
 
-// ================================================
+// =====================================================
 // 21. BACK TO SEARCH ITEMS
-// ================================================
+// =====================================================
 
 document.getElementById("claim-back-btn")
     .addEventListener("click", async function() {
@@ -1733,9 +1829,9 @@ document.getElementById("claim-back-btn")
     });
 
 
-// ================================================
+// =====================================================
 // 22. SUBMIT OWNERSHIP CLAIM
-// ================================================
+// =====================================================
 
 claimForm.addEventListener(
     "submit",
@@ -1796,8 +1892,7 @@ claimForm.addEventListener(
             }
 
 
-            // Retrieve the latest found-item status
-            // from the database.
+            // Retrieve latest found-item status.
 
             const { data: foundItem, error: itemError } =
                 await supabaseClient
@@ -1836,7 +1931,7 @@ claimForm.addEventListener(
             }
 
 
-            // Check for an existing claim.
+            // Check for existing claim.
 
             const { data: existingClaim, error: checkError } =
                 await supabaseClient
@@ -1918,7 +2013,10 @@ claimForm.addEventListener(
 
         } catch (error) {
 
-            console.error(error);
+            console.error(
+                "Claim submission error:",
+                error
+            );
 
             showNotification(
                 error.message,
@@ -1939,9 +2037,9 @@ claimForm.addEventListener(
 );
 
 
-// ================================================
+// =====================================================
 // 23. LOAD MY OWNERSHIP CLAIMS
-// ================================================
+// =====================================================
 
 async function loadMyClaims() {
 
@@ -2142,7 +2240,10 @@ async function loadMyClaims() {
 
     } catch (error) {
 
-        console.error(error);
+        console.error(
+            "My Claims error:",
+            error
+        );
 
         if (requestId !== currentPageRequest) {
 
@@ -2168,9 +2269,9 @@ async function loadMyClaims() {
 }
 
 
-// ================================================
+// =====================================================
 // 24. AUTHENTICATION STATE CHANGES
-// ================================================
+// =====================================================
 
 supabaseClient.auth.onAuthStateChange(
     function(event, session) {
@@ -2201,9 +2302,9 @@ supabaseClient.auth.onAuthStateChange(
 );
 
 
-// ================================================
+// =====================================================
 // 25. CHECK EXISTING LOGIN SESSION
-// ================================================
+// =====================================================
 
 async function checkSession() {
 
@@ -2237,7 +2338,10 @@ async function checkSession() {
 
     } catch (error) {
 
-        console.error(error);
+        console.error(
+            "Session error:",
+            error
+        );
 
         currentUser = null;
 
@@ -2248,8 +2352,8 @@ async function checkSession() {
 }
 
 
-// ================================================
+// =====================================================
 // 26. START APPLICATION
-// ================================================
+// =====================================================
 
 checkSession();
