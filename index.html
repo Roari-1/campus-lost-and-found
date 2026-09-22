@@ -662,6 +662,118 @@
 </main>
 
 
+<!-- ======================================
+     CLAIM ITEM PAGE
+====================================== -->
+
+<main id="claim-page" class="page hidden">
+
+    <section class="form-container">
+
+        <button
+            type="button"
+            class="back-btn"
+            id="claim-back-btn"
+        >
+            ← Back to Search
+        </button>
+
+        <h2>Claim Found Item</h2>
+
+        <p>
+            Please provide information that can
+            help verify your ownership of this item.
+        </p>
+
+
+        <!-- SELECTED ITEM INFORMATION -->
+
+        <div class="selected-item">
+
+            <h3 id="claim-item-name">
+                Selected Item
+            </h3>
+
+            <p id="claim-item-details"></p>
+
+        </div>
+
+
+        <!-- CLAIM FORM -->
+
+        <form id="claim-form">
+
+            <input
+                type="hidden"
+                id="claim-found-id"
+            >
+
+
+            <label for="claim-description">
+                Proof of Ownership
+            </label>
+
+            <textarea
+                id="claim-description"
+                placeholder="Describe unique identifying details that can help an administrator verify your ownership."
+                rows="5"
+                minlength="10"
+                maxlength="1000"
+                required
+            ></textarea>
+
+
+            <p class="form-hint">
+                Your ownership description is intended
+                for administrator verification.
+                Do not enter passwords, PINs,
+                government ID numbers, or banking details.
+            </p>
+
+
+            <button type="submit">
+                Submit Claim Request
+            </button>
+
+        </form>
+
+    </section>
+
+</main>
+
+
+<!-- ======================================
+     MY CLAIMS PAGE
+====================================== -->
+
+<main id="claims-page" class="page hidden">
+
+    <section class="list-container">
+
+        <button
+            type="button"
+            class="back-btn"
+            data-back-dashboard
+        >
+            ← Back to Dashboard
+        </button>
+
+        <h2>My Claims</h2>
+
+        <p>
+            Track the status of your
+            submitted ownership claims.
+        </p>
+
+        <div
+            id="my-claims-results"
+            class="items-grid"
+        ></div>
+
+    </section>
+
+</main>
+
 
     <!-- NOTIFICATION MESSAGE -->
 
