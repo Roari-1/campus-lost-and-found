@@ -1,3 +1,9 @@
+
+/* ========================================
+   CAMPUS LOST AND FOUND
+   MAIN STYLESHEET
+======================================== */
+
 * {
     margin: 0;
     padding: 0;
@@ -8,7 +14,15 @@ body {
     font-family: Arial, sans-serif;
     background: #f5f7fa;
     color: #222;
+
+    min-height: 100vh;
+
+    display: flex;
+    flex-direction: column;
 }
+
+
+/* HEADER */
 
 header {
     background: #1e3a8a;
@@ -21,26 +35,50 @@ header h1 {
     margin-bottom: 8px;
 }
 
+
+/* MAIN PAGE */
+
 main {
-    min-height: 80vh;
+    flex: 1;
+    padding: 30px 20px;
+}
+
+.page {
+    width: 100%;
+}
+
+.hidden {
+    display: none !important;
+}
+
+
+/* HOME PAGE */
+
+#home-page {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 30px;
 }
 
 .hero {
     background: white;
+
     max-width: 700px;
     width: 100%;
-    padding: 40px;
+
+    padding: 45px 35px;
+
     text-align: center;
+
     border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+
+    box-shadow:
+        0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 .hero h2 {
     margin-bottom: 15px;
+    color: #1e3a8a;
 }
 
 .hero p {
@@ -48,22 +86,255 @@ main {
     line-height: 1.6;
 }
 
+
+/* BUTTONS */
+
 button {
     background: #1e3a8a;
     color: white;
+
     border: none;
     padding: 12px 25px;
+
     border-radius: 6px;
+
     cursor: pointer;
     font-size: 16px;
+
+    transition: background 0.2s;
 }
 
-button:hover {
+button:hover:not(:disabled) {
     background: #162d6b;
 }
 
-footer {
+button:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+}
+
+
+/* LOGIN AND REGISTRATION */
+
+#login-page,
+#register-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.auth-card {
+    background: white;
+
+    max-width: 420px;
+    width: 100%;
+
+    padding: 35px;
+
+    border-radius: 12px;
+
+    box-shadow:
+        0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.auth-card h2 {
+    color: #1e3a8a;
+    margin-bottom: 10px;
     text-align: center;
-    padding: 20px;
+}
+
+.auth-card > p {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #555;
+}
+
+.auth-card form {
+    display: flex;
+    flex-direction: column;
+}
+
+.auth-card label {
+    margin-bottom: 7px;
+    margin-top: 12px;
+
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.auth-card input {
+    width: 100%;
+
+    padding: 12px;
+
+    border: 1px solid #ccc;
+    border-radius: 6px;
+
+    font-size: 15px;
+}
+
+.auth-card input:focus {
+    outline: 2px solid #93c5fd;
+    border-color: #1e3a8a;
+}
+
+.auth-card button {
+    margin-top: 22px;
+    width: 100%;
+}
+
+.auth-link {
+    margin-top: 20px;
+    font-size: 14px;
+}
+
+.auth-link a {
+    color: #1e3a8a;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.auth-link a:hover {
+    text-decoration: underline;
+}
+
+
+/* DASHBOARD */
+
+.dashboard-container {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.dashboard-header {
+    background: white;
+
+    padding: 25px;
+
+    border-radius: 10px;
+
+    margin-bottom: 25px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    gap: 20px;
+}
+
+.dashboard-header h2 {
+    color: #1e3a8a;
+    margin-bottom: 8px;
+}
+
+.dashboard-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 20px;
+}
+
+.dashboard-card {
+    background: white;
+
+    padding: 25px;
+
+    border-radius: 10px;
+
+    box-shadow:
+        0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.dashboard-card h3 {
+    color: #1e3a8a;
+    margin-bottom: 12px;
+}
+
+.dashboard-card p {
+    color: #555;
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
+
+
+/* NOTIFICATIONS */
+
+.notification {
+    position: fixed;
+
+    bottom: 25px;
+    right: 25px;
+
+    background: #1e3a8a;
+    color: white;
+
+    padding: 15px 20px;
+
+    border-radius: 8px;
+
+    max-width: 350px;
+
+    box-shadow:
+        0 4px 15px rgba(0, 0, 0, 0.2);
+
+    z-index: 1000;
+}
+
+.notification.error {
+    background: #b91c1c;
+}
+
+.notification.success {
+    background: #15803d;
+}
+
+
+/* FOOTER */
+
+footer {
     background: #e5e7eb;
+
+    text-align: center;
+
+    padding: 20px;
+}
+
+
+/* MOBILE RESPONSIVENESS */
+
+@media (max-width: 650px) {
+
+    header {
+        padding: 20px 15px;
+    }
+
+    header h1 {
+        font-size: 24px;
+    }
+
+    .hero {
+        padding: 30px 20px;
+    }
+
+    .auth-card {
+        padding: 25px 20px;
+    }
+
+    .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .notification {
+        left: 20px;
+        right: 20px;
+        max-width: none;
+    }
+
 }
