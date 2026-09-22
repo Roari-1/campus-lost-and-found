@@ -1,12 +1,41 @@
-/* ========================================
-   CAMPUS LOST AND FOUND
-   AUTHENTICATION SYSTEM
-======================================== */
+
+/* ================================================
+   CAMPUS LOST AND FOUND MANAGEMENT SYSTEM
+
+   COMPLETE JAVASCRIPT - PHASE 5
+
+   Features:
+   - Registration and Login
+   - User Dashboard
+   - Lost Item Reporting
+   - Found Item Reporting
+   - Search and Filter
+   - My Reports
+   - Possible Item Matching
+   - Ownership Claims
+   - My Claims
+   - Logout
+================================================ */
 
 
-// ========================================
-// 1. GET WEBSITE ELEMENTS
-// ========================================
+// ================================================
+// 1. GLOBAL VARIABLES
+// ================================================
+
+let currentUser = null;
+
+let allSearchItems = [];
+
+let currentSearchItems = [];
+
+let notificationTimer = null;
+
+let currentPageRequest = 0;
+
+
+// ================================================
+// 2. GET HTML ELEMENTS
+// ================================================
 
 const pages = document.querySelectorAll(".page");
 
@@ -16,20 +45,35 @@ const registerForm =
 const loginForm =
     document.getElementById("login-form");
 
+const lostForm =
+    document.getElementById("lost-form");
+
+const foundForm =
+    document.getElementById("found-form");
+
+const claimForm =
+    document.getElementById("claim-form");
+
 const welcomeMessage =
     document.getElementById("welcome-message");
 
 const notification =
     document.getElementById("notification");
 
-let currentUser = null;
+const searchInput =
+    document.getElementById("item-search");
+
+const itemFilter =
+    document.getElementById("item-filter");
 
 
-// ========================================
-// 2. PAGE NAVIGATION
-// ========================================
+// ================================================
+// 3. PAGE NAVIGATION
+// ================================================
 
 function showPage(pageId) {
+
+    currentPageRequest++;
 
     pages.forEach(function(page) {
 
@@ -51,23 +95,101 @@ function showPage(pageId) {
 }
 
 
-// ========================================
-// 3. DISPLAY NOTIFICATIONS
-// ========================================
+// ================================================
+// 4. NOTIFICATION SYSTEM
+// ================================================
 
-function showNotification(message, type = "success") {
+function showNotification(
+    message,
+    type = "success"
+) {
+
+    if (!notification) {
+
+        console.log(message);
+
+        return;
+
+    }
+
+    if (notificationTimer) {
+
+        clearTimeout(notificationTimer);
+
+    }
 
     notification.textContent = message;
 
     notification.className =
         "notification " + type;
 
+    notificationTimer = setTimeout(function() {
+
+        notification.classList.add("hidden");
+
+    }, 6000);
+
 }
 
 
-// ========================================
-// 4. NAVIGATION BUTTONS
-// ========================================
+// ================================================
+// 5. GET AUTHENTICATED USER
+// ================================================
+
+async function getAuthenticatedUser() {
+
+    const { data, error } =
+        await supabaseClient.auth.getUser();
+
+    if (error || !data.user) {
+
+        currentUser = null;
+
+        throw new Error(
+            "Please log in to continue."
+        );
+
+    }
+
+    currentUser = data.user;
+
+    return data.user;
+
+}
+
+
+// ================================================
+// 6. USER DASHBOARD
+// ================================================
+
+function showDashboard(user) {
+
+    if (!user) {
+
+        showPage("login-page");
+
+        return;
+
+    }
+
+    currentUser = user;
+
+    const fullName =
+        user.user_metadata?.full_name ||
+        user.email ||
+        "User";
+
+    welcomeMessage.textContent =
+        "Welcome, " + fullName + "!";
+
+    showPage("dashboard-page");
+
+}
+
+
+// ================================================
+// 7. HOME AND AUTHENTICATION NAVIGATION
+// ================================================
 
 document.getElementById("get-started-btn")
     .addEventListener("click", function() {
@@ -125,9 +247,9 @@ document.getElementById("register-back-home")
     });
 
 
-// ========================================
-// 5. REGISTER NEW USER
-// ========================================
+// ================================================
+// 8. USER REGISTRATION
+// ================================================
 
 registerForm.addEventListener(
     "submit",
@@ -156,8 +278,6 @@ registerForm.addEventListener(
             ).value;
 
 
-        // Check name
-
         if (!fullName) {
 
             showNotification(
@@ -169,8 +289,6 @@ registerForm.addEventListener(
 
         }
 
-
-        // Check password length
 
         if (password.length < 8) {
 
@@ -184,8 +302,6 @@ registerForm.addEventListener(
         }
 
 
-        // Confirm passwords match
-
         if (password !== confirmPassword) {
 
             showNotification(
@@ -198,18 +314,17 @@ registerForm.addEventListener(
         }
 
 
-        const submitButton =
+        const button =
             registerForm.querySelector(
                 'button[type="submit"]'
             );
 
-        submitButton.disabled = true;
-        submitButton.textContent = "Registering...";
+        button.disabled = true;
+
+        button.textContent = "Registering...";
 
 
         try {
-
-            // Register with Supabase
 
             const { data, error } =
                 await supabaseClient.auth.signUp({
@@ -242,35 +357,31 @@ registerForm.addEventListener(
             }
 
 
-            // Clear registration form
-
             registerForm.reset();
 
 
-            if (data.session) {
+            if (data.session && data.user) {
 
-                // Email confirmation is disabled.
-                // User is already authenticated.
+                showDashboard(data.user);
 
                 showNotification(
                     "Registration successful!"
                 );
 
-                showDashboard(data.user);
-
             } else {
-
-                // Email confirmation is enabled.
-
-                showNotification(
-                    "Registration submitted! Check your email for the confirmation link."
-                );
 
                 showPage("login-page");
 
+                showNotification(
+                    "Registration submitted. Check your email for the confirmation link."
+                );
+
             }
 
+
         } catch (error) {
+
+            console.error(error);
 
             showNotification(
                 error.message,
@@ -279,9 +390,9 @@ registerForm.addEventListener(
 
         } finally {
 
-            submitButton.disabled = false;
+            button.disabled = false;
 
-            submitButton.textContent = "Register";
+            button.textContent = "Register";
 
         }
 
@@ -289,15 +400,16 @@ registerForm.addEventListener(
 );
 
 
-// ========================================
-// 6. LOGIN USER
-// ========================================
+// ================================================
+// 9. USER LOGIN
+// ================================================
 
 loginForm.addEventListener(
     "submit",
     async function(event) {
 
         event.preventDefault();
+
 
         const email =
             document.getElementById(
@@ -310,25 +422,27 @@ loginForm.addEventListener(
             ).value;
 
 
-        const submitButton =
+        const button =
             loginForm.querySelector(
                 'button[type="submit"]'
             );
 
-        submitButton.disabled = true;
-        submitButton.textContent = "Logging in...";
+        button.disabled = true;
+
+        button.textContent = "Logging in...";
 
 
         try {
 
             const { data, error } =
-                await supabaseClient.auth.signInWithPassword({
+                await supabaseClient.auth
+                    .signInWithPassword({
 
-                    email: email,
+                        email: email,
 
-                    password: password
+                        password: password
 
-                });
+                    });
 
 
             if (error) {
@@ -338,15 +452,27 @@ loginForm.addEventListener(
             }
 
 
+            if (!data.user) {
+
+                throw new Error(
+                    "Unable to retrieve your account."
+                );
+
+            }
+
+
             loginForm.reset();
+
+            showDashboard(data.user);
 
             showNotification(
                 "Login successful!"
             );
 
-            showDashboard(data.user);
 
         } catch (error) {
+
+            console.error(error);
 
             showNotification(
                 error.message,
@@ -355,9 +481,9 @@ loginForm.addEventListener(
 
         } finally {
 
-            submitButton.disabled = false;
+            button.disabled = false;
 
-            submitButton.textContent = "Login";
+            button.textContent = "Login";
 
         }
 
@@ -365,38 +491,9 @@ loginForm.addEventListener(
 );
 
 
-// ========================================
-// 7. USER DASHBOARD
-// ========================================
-
-function showDashboard(user) {
-
-    if (!user) {
-
-        showPage("login-page");
-
-        return;
-
-    }
-
-    currentUser = user;
-
-    const fullName =
-        user.user_metadata?.full_name ||
-        user.email ||
-        "User";
-
-    welcomeMessage.textContent =
-        "Welcome, " + fullName + "!";
-
-    showPage("dashboard-page");
-
-}
-
-
-// ========================================
-// 8. LOGOUT
-// ========================================
+// ================================================
+// 10. USER LOGOUT
+// ================================================
 
 document.getElementById("logout-btn")
     .addEventListener("click", async function() {
@@ -414,13 +511,20 @@ document.getElementById("logout-btn")
 
             currentUser = null;
 
+            allSearchItems = [];
+
+            currentSearchItems = [];
+
             showPage("home-page");
 
             showNotification(
                 "You have successfully logged out."
             );
 
+
         } catch (error) {
+
+            console.error(error);
 
             showNotification(
                 error.message,
@@ -432,124 +536,9 @@ document.getElementById("logout-btn")
     });
 
 
-// ========================================
-// 9. CHECK EXISTING LOGIN SESSION
-// ========================================
-
-async function checkSession() {
-
-    try {
-
-        const { data, error } =
-            await supabaseClient.auth.getSession();
-
-        if (error) {
-
-            throw error;
-
-        }
-
-        if (data.session?.user) {
-
-            showDashboard(
-                data.session.user
-            );
-
-        } else {
-
-            showPage("home-page");
-
-        }
-
-    } catch (error) {
-
-        console.error(error);
-
-        showPage("home-page");
-
-    }
-
-}
-
-
-// ========================================
-// 10. LISTEN FOR AUTHENTICATION CHANGES
-// ========================================
-
-supabaseClient.auth.onAuthStateChange(
-    (event, session) => {
-
-        if (event === "SIGNED_OUT") {
-
-            currentUser = null;
-
-            showPage("home-page");
-
-        }
-
-        if (event === "SIGNED_IN" && session?.user) {
-
-            showDashboard(session.user);
-
-        }
-
-    }
-);
-
-
-// Start the application
-
-checkSession();
-
-/* ========================================
-   PHASE 4 — LOST AND FOUND REPORTS
-======================================== */
-
-
-// ========================================
-// 1. GET REPORTING ELEMENTS
-// ========================================
-
-const lostForm =
-    document.getElementById("lost-form");
-
-const foundForm =
-    document.getElementById("found-form");
-
-const searchInput =
-    document.getElementById("item-search");
-
-const itemFilter =
-    document.getElementById("item-filter");
-
-let allSearchItems = [];
-
-
-// ========================================
-// 2. GET CURRENT AUTHENTICATED USER
-// ========================================
-
-async function getAuthenticatedUser() {
-
-    const { data, error } =
-        await supabaseClient.auth.getUser();
-
-    if (error || !data.user) {
-
-        throw new Error(
-            "Please log in to continue."
-        );
-
-    }
-
-    return data.user;
-
-}
-
-
-// ========================================
-// 3. DASHBOARD NAVIGATION
-// ========================================
+// ================================================
+// 11. DASHBOARD BUTTONS
+// ================================================
 
 document.getElementById("open-lost-btn")
     .addEventListener("click", function() {
@@ -587,7 +576,19 @@ document.getElementById("open-reports-btn")
     });
 
 
-// BACK TO DASHBOARD BUTTONS
+document.getElementById("open-claims-btn")
+    .addEventListener("click", async function() {
+
+        showPage("claims-page");
+
+        await loadMyClaims();
+
+    });
+
+
+// ================================================
+// 12. BACK TO DASHBOARD
+// ================================================
 
 document.querySelectorAll(
     "[data-back-dashboard]"
@@ -621,9 +622,9 @@ document.querySelectorAll(
 });
 
 
-// ========================================
-// 4. SUBMIT LOST ITEM REPORT
-// ========================================
+// ================================================
+// 13. SUBMIT LOST ITEM REPORT
+// ================================================
 
 lostForm.addEventListener(
     "submit",
@@ -631,21 +632,22 @@ lostForm.addEventListener(
 
         event.preventDefault();
 
-        const submitButton =
+
+        const button =
             lostForm.querySelector(
                 'button[type="submit"]'
             );
 
-        submitButton.disabled = true;
+        button.disabled = true;
 
-        submitButton.textContent =
-            "Submitting...";
+        button.textContent = "Submitting...";
 
 
         try {
 
             const user =
                 await getAuthenticatedUser();
+
 
             const report = {
 
@@ -686,6 +688,20 @@ lostForm.addEventListener(
             };
 
 
+            if (
+                !report.item_name ||
+                !report.category ||
+                !report.date_lost ||
+                !report.location_lost
+            ) {
+
+                throw new Error(
+                    "Please complete all required fields."
+                );
+
+            }
+
+
             const { error } =
                 await supabaseClient
 
@@ -703,11 +719,12 @@ lostForm.addEventListener(
 
             lostForm.reset();
 
+            showDashboard(user);
+
             showNotification(
                 "Lost item report submitted successfully!"
             );
 
-            showDashboard(user);
 
         } catch (error) {
 
@@ -720,9 +737,9 @@ lostForm.addEventListener(
 
         } finally {
 
-            submitButton.disabled = false;
+            button.disabled = false;
 
-            submitButton.textContent =
+            button.textContent =
                 "Submit Lost Report";
 
         }
@@ -731,9 +748,9 @@ lostForm.addEventListener(
 );
 
 
-// ========================================
-// 5. SUBMIT FOUND ITEM REPORT
-// ========================================
+// ================================================
+// 14. SUBMIT FOUND ITEM REPORT
+// ================================================
 
 foundForm.addEventListener(
     "submit",
@@ -741,21 +758,22 @@ foundForm.addEventListener(
 
         event.preventDefault();
 
-        const submitButton =
+
+        const button =
             foundForm.querySelector(
                 'button[type="submit"]'
             );
 
-        submitButton.disabled = true;
+        button.disabled = true;
 
-        submitButton.textContent =
-            "Submitting...";
+        button.textContent = "Submitting...";
 
 
         try {
 
             const user =
                 await getAuthenticatedUser();
+
 
             const report = {
 
@@ -801,6 +819,21 @@ foundForm.addEventListener(
             };
 
 
+            if (
+                !report.item_name ||
+                !report.category ||
+                !report.date_found ||
+                !report.location_found ||
+                !report.current_location
+            ) {
+
+                throw new Error(
+                    "Please complete all required fields."
+                );
+
+            }
+
+
             const { error } =
                 await supabaseClient
 
@@ -818,11 +851,12 @@ foundForm.addEventListener(
 
             foundForm.reset();
 
+            showDashboard(user);
+
             showNotification(
                 "Found item report submitted successfully!"
             );
 
-            showDashboard(user);
 
         } catch (error) {
 
@@ -835,9 +869,9 @@ foundForm.addEventListener(
 
         } finally {
 
-            submitButton.disabled = false;
+            button.disabled = false;
 
-            submitButton.textContent =
+            button.textContent =
                 "Submit Found Report";
 
         }
@@ -846,9 +880,9 @@ foundForm.addEventListener(
 );
 
 
-// ========================================
-// 6. LOAD LOST AND FOUND ITEMS
-// ========================================
+// ================================================
+// 15. LOAD ALL LOST AND FOUND ITEMS
+// ================================================
 
 async function loadSearchItems() {
 
@@ -857,17 +891,17 @@ async function loadSearchItems() {
             "search-results"
         );
 
+    const requestId = currentPageRequest;
+
     results.replaceChildren();
 
-    const loading = document.createElement("p");
-    loading.className = "empty-message";
-    loading.textContent = "Loading items...";
-    results.appendChild(loading);
+    results.textContent = "Loading items...";
 
 
     try {
 
         await getAuthenticatedUser();
+
 
         const [lostResult, foundResult] =
             await Promise.all([
@@ -895,6 +929,7 @@ async function loadSearchItems() {
 
         }
 
+
         if (foundResult.error) {
 
             throw foundResult.error;
@@ -903,53 +938,101 @@ async function loadSearchItems() {
 
 
         const lostItems =
-            lostResult.data.map(function(item) {
+            (lostResult.data || []).map(
+                function(item) {
 
-                return {
-                    ...item,
-                    report_type: "lost"
-                };
+                    return {
 
-            });
+                        ...item,
+
+                        report_type: "lost"
+
+                    };
+
+                }
+            );
 
 
         const foundItems =
-            foundResult.data.map(function(item) {
+            (foundResult.data || []).map(
+                function(item) {
 
-                return {
-                    ...item,
-                    report_type: "found"
-                };
+                    return {
 
-            });
+                        ...item,
 
+                        report_type: "found"
+
+                    };
+
+                }
+            );
+
+
+        // Store all reports for matching.
 
         allSearchItems = [
+
             ...lostItems,
+
             ...foundItems
+
         ];
 
 
+        // Sort newest reports first.
+
         allSearchItems.sort(function(a, b) {
 
-            return new Date(b.created_at) -
-                   new Date(a.created_at);
+            return (
+                new Date(b.created_at) -
+                new Date(a.created_at)
+            );
 
         });
 
 
+        // Do not overwrite another page
+        // if the user navigated away.
+
+        if (requestId !== currentPageRequest) {
+
+            return;
+
+        }
+
+
+        // Restore the full search results.
+
+        currentSearchItems = allSearchItems;
+
+        searchInput.value = "";
+
+        itemFilter.value = "all";
+
         filterSearchItems();
+
 
     } catch (error) {
 
         console.error(error);
 
+        if (requestId !== currentPageRequest) {
+
+            return;
+
+        }
+
         results.replaceChildren();
 
-        const message = document.createElement("p");
+        const message =
+            document.createElement("p");
+
         message.className = "empty-message";
+
         message.textContent =
-            "Unable to load items: " + error.message;
+            "Unable to load items: " +
+            error.message;
 
         results.appendChild(message);
 
@@ -958,9 +1041,9 @@ async function loadSearchItems() {
 }
 
 
-// ========================================
-// 7. SEARCH AND FILTER ITEMS
-// ========================================
+// ================================================
+// 16. SEARCH AND FILTER ITEMS
+// ================================================
 
 function filterSearchItems() {
 
@@ -969,12 +1052,13 @@ function filterSearchItems() {
             .trim()
             .toLowerCase();
 
+
     const selectedType =
         itemFilter.value;
 
 
     const filteredItems =
-        allSearchItems.filter(function(item) {
+        currentSearchItems.filter(function(item) {
 
             const matchesType =
                 selectedType === "all" ||
@@ -984,10 +1068,15 @@ function filterSearchItems() {
             const searchText = [
 
                 item.item_name,
+
                 item.category,
+
                 item.color
 
-            ].join(" ").toLowerCase();
+            ]
+                .filter(Boolean)
+                .join(" ")
+                .toLowerCase();
 
 
             const matchesSearch =
@@ -1007,542 +1096,7 @@ function filterSearchItems() {
 }
 
 
-/* ========================================
-   PHASE 5 — ITEM MATCHING AND CLAIMS
-======================================== */
-
-
-// ========================================
-// 1. CLAIM PAGE NAVIGATION
-// ========================================
-
-const claimForm =
-    document.getElementById("claim-form");
-
-
-document.getElementById("open-claims-btn")
-    .addEventListener("click", async function() {
-
-        showPage("claims-page");
-
-        await loadMyClaims();
-
-    });
-
-
-document.getElementById("claim-back-btn")
-    .addEventListener("click", async function() {
-
-        showPage("search-page");
-
-        await loadSearchItems();
-
-    });
-
-
-// ========================================
-// 2. FIND POSSIBLE MATCHES
-// ========================================
-
-function findPossibleMatches(lostItem) {
-
-    const normalize = function(value) {
-
-        return (value || "")
-            .trim()
-            .toLowerCase();
-
-    };
-
-
-    return allSearchItems.filter(function(item) {
-
-        // Only compare with found reports
-        // that are still available.
-
-        if (
-            item.report_type !== "found" ||
-            item.status !== "found"
-        ) {
-
-            return false;
-
-        }
-
-
-        // Match item name.
-
-        const nameMatches =
-            normalize(item.item_name) ===
-            normalize(lostItem.item_name);
-
-
-        // Match category.
-
-        const categoryMatches =
-            normalize(item.category) ===
-            normalize(lostItem.category);
-
-
-        // Match color if both reports
-        // provided a color.
-
-        const colorMatches =
-            !item.color ||
-            !lostItem.color ||
-            normalize(item.color) ===
-            normalize(lostItem.color);
-
-
-        return (
-            nameMatches &&
-            categoryMatches &&
-            colorMatches
-        );
-
-    });
-
-}
-
-
-// ========================================
-// 3. OPEN OWNERSHIP CLAIM FORM
-// ========================================
-
-function openClaimForm(item) {
-
-    if (item.status !== "found") {
-
-        showNotification(
-            "This item is no longer available for new claims.",
-            "error"
-        );
-
-        return;
-
-    }
-
-
-    // Store the selected found-item ID.
-
-    document.getElementById(
-        "claim-found-id"
-    ).value = item.id;
-
-
-    // Display item information.
-
-    document.getElementById(
-        "claim-item-name"
-    ).textContent = item.item_name;
-
-
-    document.getElementById(
-        "claim-item-details"
-    ).textContent =
-
-        "Category: " + item.category +
-
-        " | Color: " + (item.color || "Not specified") +
-
-        " | Found at: " + item.location_found;
-
-
-    // Clear previous claim description.
-
-    claimForm.reset();
-
-
-    // Restore selected item after resetting.
-
-    document.getElementById(
-        "claim-found-id"
-    ).value = item.id;
-
-
-    showPage("claim-page");
-
-}
-
-
-// ========================================
-// 4. SUBMIT OWNERSHIP CLAIM
-// ========================================
-
-claimForm.addEventListener(
-    "submit",
-    async function(event) {
-
-        event.preventDefault();
-
-
-        const submitButton =
-            claimForm.querySelector(
-                'button[type="submit"]'
-            );
-
-
-        submitButton.disabled = true;
-
-        submitButton.textContent =
-            "Submitting Claim...";
-
-
-        try {
-
-            const user =
-                await getAuthenticatedUser();
-
-
-            const foundItemId =
-                Number(
-                    document.getElementById(
-                        "claim-found-id"
-                    ).value
-                );
-
-
-            const description =
-                document.getElementById(
-                    "claim-description"
-                ).value.trim();
-
-
-            if (
-                !Number.isSafeInteger(foundItemId) ||
-                foundItemId <= 0
-            ) {
-
-                throw new Error(
-                    "Please select a valid found item."
-                );
-
-            }
-
-
-            if (description.length < 10) {
-
-                throw new Error(
-                    "Please provide more identifying details."
-                );
-
-            }
-
-
-            // Check whether the user already
-            // submitted a claim for this item.
-
-            const { data: existingClaim, error: checkError } =
-                await supabaseClient
-
-                    .from("claims")
-
-                    .select("id")
-
-                    .eq("found_item_id", foundItemId)
-
-                    .eq("claimant_id", user.id)
-
-                    .maybeSingle();
-
-
-            if (checkError) {
-
-                throw checkError;
-
-            }
-
-
-            if (existingClaim) {
-
-                throw new Error(
-                    "You have already submitted a claim for this item."
-                );
-
-            }
-
-
-            // Submit ownership claim.
-
-            const { error } =
-                await supabaseClient
-
-                    .from("claims")
-
-                    .insert({
-
-                        found_item_id: foundItemId,
-
-                        claimant_id: user.id,
-
-                        claim_description: description,
-
-                        status: "pending"
-
-                    });
-
-
-            if (error) {
-
-                if (error.code === "23505") {
-
-                    throw new Error(
-                        "You have already submitted a claim for this item."
-                    );
-
-                }
-
-                throw error;
-
-            }
-
-
-            claimForm.reset();
-
-
-            showNotification(
-                "Your ownership claim has been submitted for verification!"
-            );
-
-
-            showPage("claims-page");
-
-            await loadMyClaims();
-
-
-        } catch (error) {
-
-            console.error(error);
-
-            showNotification(
-                error.message,
-                "error"
-            );
-
-
-        } finally {
-
-            submitButton.disabled = false;
-
-            submitButton.textContent =
-                "Submit Claim Request";
-
-        }
-
-    }
-);
-
-
-// ========================================
-// 5. LOAD MY OWNERSHIP CLAIMS
-// ========================================
-
-async function loadMyClaims() {
-
-    const container =
-        document.getElementById(
-            "my-claims-results"
-        );
-
-
-    container.replaceChildren();
-
-
-    const loading =
-        document.createElement("p");
-
-    loading.className = "empty-message";
-
-    loading.textContent = "Loading your claims...";
-
-    container.appendChild(loading);
-
-
-    try {
-
-        const user =
-            await getAuthenticatedUser();
-
-
-        const { data: claims, error } =
-            await supabaseClient
-
-                .from("claims")
-
-                .select(`
-                    id,
-                    found_item_id,
-                    claim_description,
-                    status,
-                    created_at,
-                    found_items (
-                        item_name,
-                        category,
-                        color
-                    )
-                `)
-
-                .eq("claimant_id", user.id)
-
-                .order("created_at", {
-                    ascending: false
-                });
-
-
-        if (error) {
-
-            throw error;
-
-        }
-
-
-        container.replaceChildren();
-
-
-        if (!claims || claims.length === 0) {
-
-            const empty =
-                document.createElement("p");
-
-            empty.className = "empty-message";
-
-            empty.textContent =
-                "You have not submitted any ownership claims.";
-
-            container.appendChild(empty);
-
-            return;
-
-        }
-
-
-        claims.forEach(function(claim) {
-
-            const card =
-                document.createElement("article");
-
-            card.className = "claim-card";
-
-
-            // Item name
-
-            const title =
-                document.createElement("h3");
-
-            title.textContent =
-                claim.found_items?.item_name ||
-                "Found Item #" + claim.found_item_id;
-
-            card.appendChild(title);
-
-
-            // Claim number
-
-            const claimNumber =
-                document.createElement("p");
-
-            claimNumber.textContent =
-                "Claim Number: " + claim.id;
-
-            card.appendChild(claimNumber);
-
-
-            // Category
-
-            const category =
-                document.createElement("p");
-
-            category.textContent =
-                "Category: " +
-                (claim.found_items?.category || "N/A");
-
-            card.appendChild(category);
-
-
-            // Date submitted
-
-            const date =
-                document.createElement("p");
-
-            date.textContent =
-                "Date Submitted: " +
-
-                new Date(
-                    claim.created_at
-                ).toLocaleString();
-
-            card.appendChild(date);
-
-
-            // Ownership description
-
-            const description =
-                document.createElement("p");
-
-            description.textContent =
-                "Your Ownership Description: " +
-                claim.claim_description;
-
-            card.appendChild(description);
-
-
-            // Claim status
-
-            const status =
-                document.createElement("span");
-
-            status.className =
-                "claim-status " + claim.status;
-
-
-            if (claim.status === "pending") {
-
-                status.textContent =
-                    "PENDING VERIFICATION";
-
-            } else if (claim.status === "approved") {
-
-                status.textContent =
-                    "APPROVED";
-
-            } else {
-
-                status.textContent =
-                    "REJECTED";
-
-            }
-
-
-            card.appendChild(status);
-
-
-            container.appendChild(card);
-
-        });
-
-
-    } catch (error) {
-
-        console.error(error);
-
-        container.replaceChildren();
-
-        const message =
-            document.createElement("p");
-
-        message.className = "empty-message";
-
-        message.textContent =
-            "Unable to load claims: " + error.message;
-
-        container.appendChild(message);
-
-    }
-
-}
-
-
-// SEARCH INPUT EVENT
+// Search input
 
 searchInput.addEventListener(
     "input",
@@ -1550,7 +1104,7 @@ searchInput.addEventListener(
 );
 
 
-// FILTER DROPDOWN EVENT
+// Item type filter
 
 itemFilter.addEventListener(
     "change",
@@ -1558,135 +1112,88 @@ itemFilter.addEventListener(
 );
 
 
-// ========================================
-// 8. LOAD MY REPORTS
-// ========================================
+// ================================================
+// 17. FIND POSSIBLE MATCHES
+// ================================================
 
-async function loadMyReports() {
+function findPossibleMatches(lostItem) {
 
-    const results =
-        document.getElementById(
-            "my-reports-results"
-        );
+    function normalize(value) {
 
-    results.replaceChildren();
+        return String(value || "")
+            .trim()
+            .toLowerCase();
 
-    const loading = document.createElement("p");
-    loading.className = "empty-message";
-    loading.textContent = "Loading your reports...";
-    results.appendChild(loading);
+    }
 
 
-    try {
+    const matches =
+        allSearchItems.filter(function(item) {
 
-        const user =
-            await getAuthenticatedUser();
+            // Only available found items.
 
+            if (
+                item.report_type !== "found" ||
+                item.status !== "found"
+            ) {
 
-        const [lostResult, foundResult] =
-            await Promise.all([
+                return false;
 
-                supabaseClient
-                    .from("lost_items")
-                    .select("*")
-                    .eq("user_id", user.id),
-
-                supabaseClient
-                    .from("found_items")
-                    .select("*")
-                    .eq("user_id", user.id)
-
-            ]);
+            }
 
 
-        if (lostResult.error) {
+            // Compare item name.
 
-            throw lostResult.error;
-
-        }
-
-        if (foundResult.error) {
-
-            throw foundResult.error;
-
-        }
+            const nameMatches =
+                normalize(item.item_name) ===
+                normalize(lostItem.item_name);
 
 
-        const lostItems =
-            lostResult.data.map(function(item) {
+            // Compare category.
 
-                return {
-                    ...item,
-                    report_type: "lost"
-                };
-
-            });
+            const categoryMatches =
+                normalize(item.category) ===
+                normalize(lostItem.category);
 
 
-        const foundItems =
-            foundResult.data.map(function(item) {
+            // Compare color when both
+            // reports specify a color.
 
-                return {
-                    ...item,
-                    report_type: "found"
-                };
-
-            });
-
-
-        const allReports = [
-            ...lostItems,
-            ...foundItems
-        ];
+            const colorMatches =
+                !item.color ||
+                !lostItem.color ||
+                normalize(item.color) ===
+                normalize(lostItem.color);
 
 
-        allReports.sort(function(a, b) {
-
-            return new Date(b.created_at) -
-                   new Date(a.created_at);
+            return (
+                nameMatches &&
+                categoryMatches &&
+                colorMatches
+            );
 
         });
 
 
-        renderItems(
-            allReports,
-            "my-reports-results"
-        );
-
-    } catch (error) {
-
-        console.error(error);
-
-        results.replaceChildren();
-
-        const message = document.createElement("p");
-        message.className = "empty-message";
-        message.textContent =
-            "Unable to load reports: " + error.message;
-
-        results.appendChild(message);
-
-    }
+    return matches;
 
 }
 
 
-// ========================================
-// 9. CREATE AND DISPLAY ITEM CARDS
-// ========================================
-
+// ================================================
+// 18. DISPLAY LOST AND FOUND ITEM CARDS
+// ================================================
 
 function renderItems(items, containerId) {
 
     const container =
         document.getElementById(containerId);
 
+
     container.replaceChildren();
 
 
-    // Display a message when no items exist.
-
-    if (items.length === 0) {
+    if (!items || items.length === 0) {
 
         const message =
             document.createElement("p");
@@ -1703,7 +1210,9 @@ function renderItems(items, containerId) {
     }
 
 
-    // Create a separate card for each item.
+    // IMPORTANT:
+    // Every item card and its buttons
+    // must be created inside this loop.
 
     items.forEach(function(item) {
 
@@ -1713,7 +1222,7 @@ function renderItems(items, containerId) {
         card.className = "item-card";
 
 
-        // ITEM TYPE
+        // ITEM TYPE BADGE
 
         const badge =
             document.createElement("span");
@@ -1734,19 +1243,30 @@ function renderItems(items, containerId) {
         const title =
             document.createElement("h3");
 
-        title.textContent = item.item_name;
+        title.textContent =
+            item.item_name || "Unnamed Item";
 
         card.appendChild(title);
 
 
-        // ITEM DETAILS
+        // HELPER FOR ITEM DETAILS
 
         function addDetail(label, value) {
 
-            if (!value) return;
+            if (
+                value === null ||
+                value === undefined ||
+                value === ""
+            ) {
+
+                return;
+
+            }
+
 
             const paragraph =
                 document.createElement("p");
+
 
             const labelElement =
                 document.createElement("strong");
@@ -1754,20 +1274,38 @@ function renderItems(items, containerId) {
             labelElement.textContent =
                 label + ": ";
 
-            paragraph.appendChild(labelElement);
 
             paragraph.appendChild(
-                document.createTextNode(value)
+                labelElement
             );
 
-            card.appendChild(paragraph);
+
+            paragraph.appendChild(
+                document.createTextNode(
+                    String(value)
+                )
+            );
+
+
+            card.appendChild(
+                paragraph
+            );
 
         }
 
 
-        addDetail("Category", item.category);
+        // ITEM INFORMATION
 
-        addDetail("Color", item.color);
+        addDetail(
+            "Category",
+            item.category
+        );
+
+
+        addDetail(
+            "Color",
+            item.color
+        );
 
 
         addDetail(
@@ -1824,22 +1362,23 @@ function renderItems(items, containerId) {
 
         status.textContent =
             "Status: " +
-            item.status.replaceAll("_", " ");
+            String(item.status || "unknown")
+                .replaceAll("_", " ");
 
         card.appendChild(status);
 
 
         // ====================================
-        // PHASE 5: MATCHING AND CLAIM BUTTONS
+        // POSSIBLE MATCH AND CLAIM BUTTONS
         // ====================================
 
-        // These buttons should only appear
-        // on the Search Items page.
+        // Buttons only appear on Search Items.
 
         if (containerId === "search-results") {
 
 
-            // LOST ITEM: FIND POSSIBLE MATCHES
+            // LOST ITEM:
+            // DISPLAY POSSIBLE MATCHES
 
             if (
                 item.report_type === "lost" &&
@@ -1861,9 +1400,13 @@ function renderItems(items, containerId) {
                     matchLabel.textContent =
                         matches.length +
                         " POSSIBLE MATCH" +
-                        (matches.length === 1 ? "" : "ES");
+                        (matches.length === 1
+                            ? ""
+                            : "ES");
 
-                    card.appendChild(matchLabel);
+                    card.appendChild(
+                        matchLabel
+                    );
 
 
                     const matchButton =
@@ -1880,22 +1423,38 @@ function renderItems(items, containerId) {
                         "click",
                         function() {
 
-                            renderItems(
-                                matches,
-                                "search-results"
-                            );
+                            // Store the matched items.
+
+                            currentSearchItems =
+                                matches;
+
+
+                            // Reset search controls.
+
+                            searchInput.value = "";
+
+                            itemFilter.value = "all";
+
+
+                            // Display matching found items.
+
+                            filterSearchItems();
 
                         }
                     );
 
-                    card.appendChild(matchButton);
+
+                    card.appendChild(
+                        matchButton
+                    );
 
                 }
 
             }
 
 
-            // FOUND ITEM: CLAIM BUTTON
+            // FOUND ITEM:
+            // DISPLAY CLAIM BUTTON
 
             if (
                 item.report_type === "found" &&
@@ -1923,15 +1482,16 @@ function renderItems(items, containerId) {
                 );
 
 
-                card.appendChild(claimButton);
+                card.appendChild(
+                    claimButton
+                );
 
             }
 
         }
 
 
-        // Add this completed item card
-        // to the Search Items or My Reports page.
+        // ADD COMPLETED CARD TO PAGE
 
         container.appendChild(card);
 
@@ -1940,238 +1500,756 @@ function renderItems(items, containerId) {
 }
 
 
+// ================================================
+// 19. LOAD MY REPORTS
+// ================================================
+
+async function loadMyReports() {
+
+    const results =
+        document.getElementById(
+            "my-reports-results"
+        );
+
+    const requestId = currentPageRequest;
+
+    results.replaceChildren();
+
+    results.textContent =
+        "Loading your reports...";
 
 
-// ========================================
-// PHASE 5 — MATCHING AND CLAIM BUTTONS
-// ========================================
+    try {
 
-// Show interactive matching and claiming
-// buttons only on the Search Items page.
-
-if (containerId === "search-results") {
-
-    // LOST ITEM: Find possible matches.
-
-    if (
-        item.report_type === "lost" &&
-        item.status === "lost"
-    ) {
-
-        const matches =
-            findPossibleMatches(item);
+        const user =
+            await getAuthenticatedUser();
 
 
-        if (matches.length > 0) {
+        const [lostResult, foundResult] =
+            await Promise.all([
 
-            const matchLabel =
-                document.createElement("span");
+                supabaseClient
+                    .from("lost_items")
+                    .select("*")
+                    .eq("user_id", user.id),
 
-            matchLabel.className =
-                "possible-match";
+                supabaseClient
+                    .from("found_items")
+                    .select("*")
+                    .eq("user_id", user.id)
 
-            matchLabel.textContent =
-                matches.length +
-                " POSSIBLE MATCH" +
-                (matches.length === 1 ? "" : "ES");
-
-
-            card.appendChild(matchLabel);
-
-
-            const matchButton =
-                document.createElement("button");
-
-            matchButton.className =
-                "match-btn";
-
-            matchButton.textContent =
-                "View Possible Matches";
+            ]);
 
 
-            matchButton.addEventListener(
-                "click",
-                function() {
+        if (lostResult.error) {
 
-                    // Show matching found items.
+            throw lostResult.error;
 
-                    renderItems(
-                        matches,
-                        "search-results"
-                    );
+        }
 
 
-                    document.getElementById(
-                        "search-results"
-                    ).scrollIntoView({
-                        behavior: "smooth"
-                    });
+        if (foundResult.error) {
+
+            throw foundResult.error;
+
+        }
+
+
+        const lostItems =
+            (lostResult.data || []).map(
+                function(item) {
+
+                    return {
+
+                        ...item,
+
+                        report_type: "lost"
+
+                    };
 
                 }
             );
 
 
-            card.appendChild(matchButton);
+        const foundItems =
+            (foundResult.data || []).map(
+                function(item) {
+
+                    return {
+
+                        ...item,
+
+                        report_type: "found"
+
+                    };
+
+                }
+            );
+
+
+        const allReports = [
+
+            ...lostItems,
+
+            ...foundItems
+
+        ];
+
+
+        allReports.sort(function(a, b) {
+
+            return (
+                new Date(b.created_at) -
+                new Date(a.created_at)
+            );
+
+        });
+
+
+        if (requestId !== currentPageRequest) {
+
+            return;
 
         }
 
-    }
 
-
-    // FOUND ITEM: Allow ownership claim.
-
-    if (
-        item.report_type === "found" &&
-        item.status === "found" &&
-        item.user_id !== currentUser?.id
-    ) {
-
-        const claimButton =
-            document.createElement("button");
-
-        claimButton.className =
-            "claim-btn";
-
-        claimButton.textContent =
-            "Claim This Item";
-
-
-        claimButton.addEventListener(
-            "click",
-            function() {
-
-                openClaimForm(item);
-
-            }
+        renderItems(
+            allReports,
+            "my-reports-results"
         );
 
 
-        card.appendChild(claimButton);
+    } catch (error) {
+
+        console.error(error);
+
+        if (requestId !== currentPageRequest) {
+
+            return;
+
+        }
+
+        results.replaceChildren();
+
+        const message =
+            document.createElement("p");
+
+        message.className = "empty-message";
+
+        message.textContent =
+            "Unable to load reports: " +
+            error.message;
+
+        results.appendChild(message);
 
     }
 
 }
 
 
-// Add the completed card to the page.
+// ================================================
+// 20. OPEN OWNERSHIP CLAIM FORM
+// ================================================
 
-container.appendChild(card);
+function openClaimForm(item) {
 
+    if (
+        !item ||
+        item.report_type !== "found" ||
+        item.status !== "found"
+    ) {
 
-    items.forEach(function(item) {
+        showNotification(
+            "This found item is not available for claiming.",
+            "error"
+        );
 
-        const card =
-            document.createElement("article");
+        return;
 
-        card.className = "item-card";
-
-
-        const badge =
-            document.createElement("span");
-
-        badge.className =
-            "item-type " + item.report_type;
-
-        badge.textContent =
-            item.report_type === "lost"
-                ? "LOST ITEM"
-                : "FOUND ITEM";
-
-        card.appendChild(badge);
+    }
 
 
-        const title =
-            document.createElement("h3");
+    if (item.user_id === currentUser?.id) {
 
-        title.textContent = item.item_name;
+        showNotification(
+            "You cannot claim an item you reported yourself.",
+            "error"
+        );
 
-        card.appendChild(title);
+        return;
+
+    }
 
 
-        function addDetail(label, value) {
+    claimForm.reset();
 
-            if (!value) return;
 
-            const paragraph =
+    // Store selected found item ID.
+
+    document.getElementById(
+        "claim-found-id"
+    ).value = item.id;
+
+
+    // Display selected item name.
+
+    document.getElementById(
+        "claim-item-name"
+    ).textContent = item.item_name;
+
+
+    // Display basic item details.
+
+    document.getElementById(
+        "claim-item-details"
+    ).textContent =
+
+        "Category: " +
+        item.category +
+
+        " | Color: " +
+        (item.color || "Not specified") +
+
+        " | Found at: " +
+        item.location_found;
+
+
+    showPage("claim-page");
+
+}
+
+
+// ================================================
+// 21. BACK TO SEARCH ITEMS
+// ================================================
+
+document.getElementById("claim-back-btn")
+    .addEventListener("click", async function() {
+
+        showPage("search-page");
+
+        await loadSearchItems();
+
+    });
+
+
+// ================================================
+// 22. SUBMIT OWNERSHIP CLAIM
+// ================================================
+
+claimForm.addEventListener(
+    "submit",
+    async function(event) {
+
+        event.preventDefault();
+
+
+        const button =
+            claimForm.querySelector(
+                'button[type="submit"]'
+            );
+
+        button.disabled = true;
+
+        button.textContent =
+            "Submitting Claim...";
+
+
+        try {
+
+            const user =
+                await getAuthenticatedUser();
+
+
+            const foundItemId =
+                Number(
+                    document.getElementById(
+                        "claim-found-id"
+                    ).value
+                );
+
+
+            const description =
+                document.getElementById(
+                    "claim-description"
+                ).value.trim();
+
+
+            if (
+                !Number.isSafeInteger(foundItemId) ||
+                foundItemId <= 0
+            ) {
+
+                throw new Error(
+                    "Please select a valid found item."
+                );
+
+            }
+
+
+            if (description.length < 10) {
+
+                throw new Error(
+                    "Please provide more identifying details."
+                );
+
+            }
+
+
+            // Retrieve the latest found-item status
+            // from the database.
+
+            const { data: foundItem, error: itemError } =
+                await supabaseClient
+
+                    .from("found_items")
+
+                    .select("id, user_id, status")
+
+                    .eq("id", foundItemId)
+
+                    .single();
+
+
+            if (itemError) {
+
+                throw itemError;
+
+            }
+
+
+            if (foundItem.status !== "found") {
+
+                throw new Error(
+                    "This item is no longer available for claiming."
+                );
+
+            }
+
+
+            if (foundItem.user_id === user.id) {
+
+                throw new Error(
+                    "You cannot claim an item you reported yourself."
+                );
+
+            }
+
+
+            // Check for an existing claim.
+
+            const { data: existingClaim, error: checkError } =
+                await supabaseClient
+
+                    .from("claims")
+
+                    .select("id")
+
+                    .eq("found_item_id", foundItemId)
+
+                    .eq("claimant_id", user.id)
+
+                    .maybeSingle();
+
+
+            if (checkError) {
+
+                throw checkError;
+
+            }
+
+
+            if (existingClaim) {
+
+                throw new Error(
+                    "You have already submitted a claim for this item."
+                );
+
+            }
+
+
+            // Save ownership claim.
+
+            const { error } =
+                await supabaseClient
+
+                    .from("claims")
+
+                    .insert({
+
+                        found_item_id: foundItemId,
+
+                        claimant_id: user.id,
+
+                        claim_description: description,
+
+                        status: "pending"
+
+                    });
+
+
+            if (error) {
+
+                if (error.code === "23505") {
+
+                    throw new Error(
+                        "You have already submitted a claim for this item."
+                    );
+
+                }
+
+                throw error;
+
+            }
+
+
+            claimForm.reset();
+
+
+            showPage("claims-page");
+
+            showNotification(
+                "Your ownership claim has been submitted for verification!"
+            );
+
+
+            await loadMyClaims();
+
+
+        } catch (error) {
+
+            console.error(error);
+
+            showNotification(
+                error.message,
+                "error"
+            );
+
+
+        } finally {
+
+            button.disabled = false;
+
+            button.textContent =
+                "Submit Claim Request";
+
+        }
+
+    }
+);
+
+
+// ================================================
+// 23. LOAD MY OWNERSHIP CLAIMS
+// ================================================
+
+async function loadMyClaims() {
+
+    const container =
+        document.getElementById(
+            "my-claims-results"
+        );
+
+    const requestId = currentPageRequest;
+
+
+    container.replaceChildren();
+
+    container.textContent =
+        "Loading your claims...";
+
+
+    try {
+
+        const user =
+            await getAuthenticatedUser();
+
+
+        const { data: claims, error } =
+            await supabaseClient
+
+                .from("claims")
+
+                .select(`
+                    id,
+                    found_item_id,
+                    claim_description,
+                    status,
+                    created_at,
+                    found_items (
+                        item_name,
+                        category,
+                        color
+                    )
+                `)
+
+                .eq("claimant_id", user.id)
+
+                .order("created_at", {
+                    ascending: false
+                });
+
+
+        if (error) {
+
+            throw error;
+
+        }
+
+
+        if (requestId !== currentPageRequest) {
+
+            return;
+
+        }
+
+
+        container.replaceChildren();
+
+
+        if (!claims || claims.length === 0) {
+
+            const message =
                 document.createElement("p");
 
-            const labelElement =
-                document.createElement("strong");
+            message.className =
+                "empty-message";
 
-            labelElement.textContent =
-                label + ": ";
+            message.textContent =
+                "You have not submitted any ownership claims.";
 
-            paragraph.appendChild(labelElement);
+            container.appendChild(message);
 
-            paragraph.appendChild(
-                document.createTextNode(value)
-            );
-
-            card.appendChild(paragraph);
+            return;
 
         }
 
 
-        addDetail("Category", item.category);
+        claims.forEach(function(claim) {
 
-        addDetail("Color", item.color);
+            const card =
+                document.createElement("article");
 
-        addDetail(
-            "Date",
-            item.report_type === "lost"
-                ? item.date_lost
-                : item.date_found
-        );
-
-        addDetail(
-            "Location",
-            item.report_type === "lost"
-                ? item.location_lost
-                : item.location_found
-        );
+            card.className = "claim-card";
 
 
-        if (item.report_type === "found") {
+            // FOUND ITEM NAME
 
-            addDetail(
-                "Currently Kept At",
-                item.current_location
-            );
+            const title =
+                document.createElement("h3");
 
-        }
+            title.textContent =
+                claim.found_items?.item_name ||
+                "Found Item #" +
+                claim.found_item_id;
+
+            card.appendChild(title);
 
 
-        if (item.description) {
+            // CLAIM NUMBER
+
+            const claimNumber =
+                document.createElement("p");
+
+            claimNumber.textContent =
+                "Claim Number: " +
+                claim.id;
+
+            card.appendChild(claimNumber);
+
+
+            // CATEGORY
+
+            const category =
+                document.createElement("p");
+
+            category.textContent =
+                "Category: " +
+                (claim.found_items?.category || "N/A");
+
+            card.appendChild(category);
+
+
+            // DATE SUBMITTED
+
+            const date =
+                document.createElement("p");
+
+            date.textContent =
+                "Date Submitted: " +
+
+                new Date(
+                    claim.created_at
+                ).toLocaleString();
+
+            card.appendChild(date);
+
+
+            // OWNERSHIP DESCRIPTION
 
             const description =
                 document.createElement("p");
 
-            description.className =
-                "item-description";
-
             description.textContent =
-                item.description;
+                "Your Ownership Description: " +
+                claim.claim_description;
 
             card.appendChild(description);
+
+
+            // CLAIM STATUS
+
+            const status =
+                document.createElement("span");
+
+            status.className =
+                "claim-status " +
+                claim.status;
+
+
+            if (claim.status === "pending") {
+
+                status.textContent =
+                    "PENDING VERIFICATION";
+
+            } else if (claim.status === "approved") {
+
+                status.textContent =
+                    "APPROVED";
+
+            } else if (claim.status === "rejected") {
+
+                status.textContent =
+                    "REJECTED";
+
+            } else {
+
+                status.textContent =
+                    String(claim.status).toUpperCase();
+
+            }
+
+
+            card.appendChild(status);
+
+
+            // ADD COMPLETED CLAIM CARD
+
+            container.appendChild(card);
+
+        });
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        if (requestId !== currentPageRequest) {
+
+            return;
+
+        }
+
+        container.replaceChildren();
+
+        const message =
+            document.createElement("p");
+
+        message.className = "empty-message";
+
+        message.textContent =
+            "Unable to load claims: " +
+            error.message;
+
+        container.appendChild(message);
+
+    }
+
+}
+
+
+// ================================================
+// 24. AUTHENTICATION STATE CHANGES
+// ================================================
+
+supabaseClient.auth.onAuthStateChange(
+    function(event, session) {
+
+        if (event === "SIGNED_OUT") {
+
+            currentUser = null;
+
+            allSearchItems = [];
+
+            currentSearchItems = [];
+
+            showPage("home-page");
 
         }
 
 
-        const status =
-            document.createElement("p");
+        if (
+            event === "SIGNED_IN" &&
+            session?.user
+        ) {
 
-        status.className =
-            "item-status";
+            currentUser = session.user;
 
-        status.textContent =
-            "Status: " +
-            item.status.replaceAll("_", " ");
+        }
 
-        card.appendChild(status);
+    }
+);
 
 
-        container.appendChild(card);
+// ================================================
+// 25. CHECK EXISTING LOGIN SESSION
+// ================================================
 
-    });
+async function checkSession() {
+
+    try {
+
+        const { data, error } =
+            await supabaseClient.auth.getSession();
+
+
+        if (error) {
+
+            throw error;
+
+        }
+
+
+        if (data.session?.user) {
+
+            showDashboard(
+                data.session.user
+            );
+
+        } else {
+
+            currentUser = null;
+
+            showPage("home-page");
+
+        }
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        currentUser = null;
+
+        showPage("home-page");
+
+    }
 
 }
+
+
+// ================================================
+// 26. START APPLICATION
+// ================================================
+
+checkSession();
