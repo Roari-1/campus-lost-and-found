@@ -751,3 +751,35 @@ footer {
     overflow-wrap: anywhere;
 
 }
+
+/* ========================================
+   PHASE 7 - ITEM PHOTOS
+======================================== */
+
+.item-photo {
+
+    display: block;
+
+    width: 100%;
+
+    height: 180px;
+
+    object-fit: cover;
+
+    border-radius: 8px;
+
+    margin: 15px 0;
+
+    background: #e5e7eb;
+
+}
+
+.form-container input[type="file"] {
+
+    padding: 10px;
+
+    background: #f8fafc;
+
+    cursor: pointer;
+
+}
