@@ -221,101 +221,446 @@
     </main>
 
 
-    <!-- USER DASHBOARD -->
 
-    <main id="dashboard-page" class="page hidden">
+<!-- USER DASHBOARD -->
 
-        <section class="dashboard-container">
+<main id="dashboard-page" class="page hidden">
 
-            <div class="dashboard-header">
+    <section class="dashboard-container">
 
-                <div>
+        <div class="dashboard-header">
 
-                    <h2 id="welcome-message">
-                        Welcome!
-                    </h2>
+            <div>
+                <h2 id="welcome-message">Welcome!</h2>
+                <p>Campus Lost & Found Dashboard</p>
+            </div>
 
-                    <p>
-                        Campus Lost & Found Dashboard
-                    </p>
+            <button id="logout-btn">
+                Logout
+            </button>
 
-                </div>
+        </div>
 
-                <button id="logout-btn">
 
-                    Logout
+        <div class="dashboard-grid">
 
+            <div class="dashboard-card">
+
+                <h3>Report Lost Item</h3>
+
+                <p>
+                    Report an item that you have lost.
+                </p>
+
+                <button id="open-lost-btn">
+                    Report Lost
                 </button>
 
             </div>
 
 
-            <div class="dashboard-grid">
+            <div class="dashboard-card">
 
-                <div class="dashboard-card">
+                <h3>Report Found Item</h3>
 
-                    <h3>Report Lost Item</h3>
+                <p>
+                    Report an item that you have found.
+                </p>
 
-                    <p>
-                        Report an item that you have lost.
-                    </p>
-
-                    <button disabled>
-                        Coming Soon
-                    </button>
-
-                </div>
-
-
-                <div class="dashboard-card">
-
-                    <h3>Report Found Item</h3>
-
-                    <p>
-                        Report an item that you have found.
-                    </p>
-
-                    <button disabled>
-                        Coming Soon
-                    </button>
-
-                </div>
-
-
-                <div class="dashboard-card">
-
-                    <h3>Search Items</h3>
-
-                    <p>
-                        Browse reported lost and found items.
-                    </p>
-
-                    <button disabled>
-                        Coming Soon
-                    </button>
-
-                </div>
-
-
-                <div class="dashboard-card">
-
-                    <h3>My Reports</h3>
-
-                    <p>
-                        View your submitted reports and claims.
-                    </p>
-
-                    <button disabled>
-                        Coming Soon
-                    </button>
-
-                </div>
+                <button id="open-found-btn">
+                    Report Found
+                </button>
 
             </div>
 
-        </section>
 
-    </main>
+            <div class="dashboard-card">
+
+                <h3>Search Items</h3>
+
+                <p>
+                    Browse reported lost and found items.
+                </p>
+
+                <button id="open-search-btn">
+                    Search Items
+                </button>
+
+            </div>
+
+
+            <div class="dashboard-card">
+
+                <h3>My Reports</h3>
+
+                <p>
+                    View your submitted lost and found reports.
+                </p>
+
+                <button id="open-reports-btn">
+                    My Reports
+                </button>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<!-- REPORT LOST ITEM PAGE -->
+
+<main id="lost-page" class="page hidden">
+
+    <section class="form-container">
+
+        <button type="button"
+                class="back-btn"
+                data-back-dashboard>
+            ← Back to Dashboard
+        </button>
+
+        <h2>Report Lost Item</h2>
+
+        <p>
+            Please provide information about
+            the item you lost.
+        </p>
+
+        <form id="lost-form">
+
+            <label for="lost-name">Item Name</label>
+
+            <input
+                type="text"
+                id="lost-name"
+                placeholder="Example: Black Wallet"
+                maxlength="100"
+                required
+            >
+
+
+            <label for="lost-category">Category</label>
+
+            <select id="lost-category" required>
+
+                <option value="">
+                    Select Category
+                </option>
+
+                <option value="Electronics">
+                    Electronics
+                </option>
+
+                <option value="Personal Items">
+                    Personal Items
+                </option>
+
+                <option value="School Supplies">
+                    School Supplies
+                </option>
+
+                <option value="Clothing">
+                    Clothing
+                </option>
+
+                <option value="Documents">
+                    Documents
+                </option>
+
+                <option value="Others">
+                    Others
+                </option>
+
+            </select>
+
+
+            <label for="lost-description">
+                Item Description
+            </label>
+
+            <textarea
+                id="lost-description"
+                placeholder="Describe the item without revealing private ownership details."
+                maxlength="1000"
+                rows="4"
+            ></textarea>
+
+
+            <label for="lost-color">Color</label>
+
+            <input
+                type="text"
+                id="lost-color"
+                placeholder="Example: Black"
+                maxlength="50"
+            >
+
+
+            <label for="lost-date">Date Lost</label>
+
+            <input
+                type="date"
+                id="lost-date"
+                required
+            >
+
+
+            <label for="lost-location">
+                Location Lost
+            </label>
+
+            <input
+                type="text"
+                id="lost-location"
+                placeholder="Example: School Canteen"
+                maxlength="150"
+                required
+            >
+
+
+            <button type="submit">
+                Submit Lost Report
+            </button>
+
+        </form>
+
+    </section>
+
+</main>
+
+
+<!-- REPORT FOUND ITEM PAGE -->
+
+<main id="found-page" class="page hidden">
+
+    <section class="form-container">
+
+        <button type="button"
+                class="back-btn"
+                data-back-dashboard>
+            ← Back to Dashboard
+        </button>
+
+        <h2>Report Found Item</h2>
+
+        <p>
+            Provide information about the item
+            you found and where it is currently kept.
+        </p>
+
+        <form id="found-form">
+
+            <label for="found-name">Item Name</label>
+
+            <input
+                type="text"
+                id="found-name"
+                placeholder="Example: Black Wallet"
+                maxlength="100"
+                required
+            >
+
+
+            <label for="found-category">Category</label>
+
+            <select id="found-category" required>
+
+                <option value="">
+                    Select Category
+                </option>
+
+                <option value="Electronics">
+                    Electronics
+                </option>
+
+                <option value="Personal Items">
+                    Personal Items
+                </option>
+
+                <option value="School Supplies">
+                    School Supplies
+                </option>
+
+                <option value="Clothing">
+                    Clothing
+                </option>
+
+                <option value="Documents">
+                    Documents
+                </option>
+
+                <option value="Others">
+                    Others
+                </option>
+
+            </select>
+
+
+            <label for="found-description">
+                Item Description
+            </label>
+
+            <textarea
+                id="found-description"
+                placeholder="Describe the item without revealing private ownership details."
+                maxlength="1000"
+                rows="4"
+            ></textarea>
+
+
+            <label for="found-color">Color</label>
+
+            <input
+                type="text"
+                id="found-color"
+                placeholder="Example: Black"
+                maxlength="50"
+            >
+
+
+            <label for="found-date">Date Found</label>
+
+            <input
+                type="date"
+                id="found-date"
+                required
+            >
+
+
+            <label for="found-location">
+                Location Found
+            </label>
+
+            <input
+                type="text"
+                id="found-location"
+                placeholder="Example: Second Floor Hallway"
+                maxlength="150"
+                required
+            >
+
+
+            <label for="found-current-location">
+                Where is the item currently kept?
+            </label>
+
+            <input
+                type="text"
+                id="found-current-location"
+                placeholder="Example: School Security Office"
+                maxlength="150"
+                required
+            >
+
+
+            <p class="form-hint">
+                For testing, use a designated school
+                office as the holding location.
+                Do not publish your home address or
+                personal contact number.
+            </p>
+
+
+            <button type="submit">
+                Submit Found Report
+            </button>
+
+        </form>
+
+    </section>
+
+</main>
+
+
+<!-- SEARCH ITEMS PAGE -->
+
+<main id="search-page" class="page hidden">
+
+    <section class="list-container">
+
+        <button type="button"
+                class="back-btn"
+                data-back-dashboard>
+            ← Back to Dashboard
+        </button>
+
+        <h2>Search Lost and Found Items</h2>
+
+        <p>
+            Browse available reports and search
+            for missing or discovered items.
+        </p>
+
+
+        <div class="search-controls">
+
+            <input
+                type="search"
+                id="item-search"
+                placeholder="Search by item name, category, or color"
+                aria-label="Search items"
+            >
+
+            <select id="item-filter"
+                    aria-label="Filter item reports">
+
+                <option value="all">
+                    All Items
+                </option>
+
+                <option value="lost">
+                    Lost Items
+                </option>
+
+                <option value="found">
+                    Found Items
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div id="search-results"
+             class="items-grid">
+        </div>
+
+    </section>
+
+</main>
+
+
+<!-- MY REPORTS PAGE -->
+
+<main id="reports-page" class="page hidden">
+
+    <section class="list-container">
+
+        <button type="button"
+                class="back-btn"
+                data-back-dashboard>
+            ← Back to Dashboard
+        </button>
+
+        <h2>My Reports</h2>
+
+        <p>
+            View the lost and found reports
+            you have submitted.
+        </p>
+
+
+        <div id="my-reports-results"
+             class="items-grid">
+        </div>
+
+    </section>
+
+</main>
+
 
 
     <!-- NOTIFICATION MESSAGE -->
